@@ -22,7 +22,7 @@ An iOS app built with SwiftUI and Firebase, designed to help single-location res
 
 ## 📋 Project Milestones
 
-- [Login Module Milestone Plan](Docs/milestones/login_milestone_plan.md)
+- [Login Module Milestone Plan](Docs/Milestones/login_milestone_plan.md)
 
 ## 📸 Screenshots & Diagrams
 > Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
