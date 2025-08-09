@@ -20,10 +20,9 @@ An iOS app built with SwiftUI and Firebase, designed to help single-location res
 - MVVM Architecture
 - Charts (optional)
 
-## 📂 Folder Structure
-- `/Models` – InventoryItem, StockLog, PurchaseOrder, etc.
-- `/Views` – Screens for Inventory, Usage, Waste, POs, Reports
-- `/Docs` – MileStone /Docs/milestones/login_milestone_plan.md
+## 📋 Project Milestones
+
+- [Login Module Milestone Plan](Docs/milestones/login_milestone_plan.md)
 
 ## 📸 Screenshots & Diagrams
 > Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
