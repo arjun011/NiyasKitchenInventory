@@ -15,7 +15,7 @@ An iOS app built with SwiftUI and Firebase, designed to help single-location res
 - Uses `ObservableObject` for state management
 - Combine framework for reactive data binding
 - Swift Concurrency (`async/await`) for clean asynchronous code
-- Swift 5 + SwiftUI
+- Swift 6 + SwiftUI
 - Firebase Firestore, Auth, Cloud Functions
 - MVVM Architecture
 - Charts (optional)
