@@ -6,14 +6,14 @@
 **Branch:** `setup/firebase-config`
 
 **Checklist**
-- [ ] Create a new Firebase project named **NiyasKitchenInventory** in Firebase Console  
-- [ ] Add iOS app in Firebase (use your app’s bundle ID)  
-- [ ] Download `GoogleService-Info.plist` and add it to the Xcode project (main app target)  
-- [ ] Enable **Email/Password Authentication** in Firebase Authentication  
-- [ ] Create **Firestore Database** (start in test mode for initial dev)  
-- [ ] Create `/users` collection manually or via seed script for test accounts  
-- [ ] Add sample admin and stock manager user accounts for development  
-- [ ] Enable Firebase Authentication Emulator for local testing (optional)  
+- [✅] Create a new Firebase project named **NiyasKitchenInventory** in Firebase Console  
+- [✅] Add iOS app in Firebase (use your app’s bundle ID)  
+- [✅] Download `GoogleService-Info.plist` and add it to the Xcode project (main app target)  
+- [✅] Enable **Email/Password Authentication** in Firebase Authentication  
+- [✅] Create **Firestore Database** (start in test mode for initial dev)  
+- [✅] Create `/users` collection manually or via seed script for test accounts  
+- [✅] Add sample admin and stock manager user accounts for development  
+- [✅] Enable Firebase Authentication Emulator for local testing (optional)  
 
 **Acceptance Criteria**
 - App builds and compiles with Firebase SDK installed  
