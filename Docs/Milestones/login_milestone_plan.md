@@ -27,14 +27,12 @@
 **Branch:** `feature/login-ui`
 
 **Checklist**
-- [ ] Add Login screen with official logo, Email, Password, “Log In” button  
-- [ ] Disable button until inputs valid (email format + non-empty password)  
-- [ ] Keyboard types + return key behavior (email → password)  
-- [ ] Password show/hide toggle  
-- [ ] Loading state inside button (spinner), inputs disabled while submitting  
-- [ ] Error banner style (non-blocking)  
-- [ ] “Forgot Password?” link  
-- [ ] App version label (small footer)  
+- [✅] Add Login screen with official logo, Email, Password, “Log In” button  
+- [✅] Disable button until inputs valid (email format + non-empty password)  
+- [✅] Keyboard types + return key behavior (email → password)  
+- [✅] Loading state inside button (spinner), inputs disabled while submitting  
+- [✅] “Forgot Password?” link  
+  
 
 **Acceptance Criteria**
 - User can enter email/password, button enables only when valid  
