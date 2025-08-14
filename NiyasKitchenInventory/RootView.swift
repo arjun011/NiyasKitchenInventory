@@ -16,7 +16,7 @@ struct RootView: View {
             if session.isLoading {
                 // simple splash/loading
                 ZStack {
-                    Color(.brandNavy).ignoresSafeArea()
+                    Color(.brandPrimary).ignoresSafeArea()
                     ProgressView().tint(.white)
                 }
             } else if session.isAuthenticated {

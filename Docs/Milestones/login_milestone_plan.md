@@ -42,39 +42,19 @@
 
 ---
 
-## 2) Auth Service (Sign-In/Sign-Out)
-**Labels:** `feature`, `backend`, `auth`  
-**Branch:** `feature/auth-service`
-
-**Checklist**
-- [ ] Create AuthService protocol & implementation (Firebase)  
-- [ ] `signIn(email, password) async throws`  
-- [ ] `signOut() throws`  
-- [ ] Map Firebase errors → friendly UI messages  
-- [ ] Unit tests for success, wrong password, user-not-found, network error  
-
-**Acceptance Criteria**
-- Valid credentials succeed and return a user session  
-- Errors are mapped to concise messages  
-- Tests pass locally  
-
----
-
-## 3) Session Gate (App Start)
+## 2) Session Gate (App Start)
 **Labels:** `feature`, `auth`  
 **Branch:** `feature/session-gate`
 
 **Checklist**
-- [ ] App start checks current session  
-- [ ] If authed → go to Dashboard  
-- [ ] If not authed/expired → show Login  
-- [ ] Show cached/offline banner when applicable  
-- [ ] Unit test: authed vs non-authed routing  
+- [✅] App start checks current session  
+- [✅] If authed → go to Dashboard  
+- [✅] If not authed/expired → show Login  
+  
 
 **Acceptance Criteria**
 - No “flash” of login on warm start when already signed in  
 - Offline with valid session enters app with banner; without session shows login  
-
 ---
 
 ## 4) Forgot Password Flow

@@ -12,91 +12,111 @@ struct LoginView: View {
     @State var loginVM = LoginViewModel()
 
     var body: some View {
-        ZStack {
-            Color(.brandNavy)
-                .ignoresSafeArea()
 
-            VStack(alignment: .center, spacing: 30) {
+        NavigationStack {
 
-                Spacer()
+            ZStack {
+                Color(.appBackground)
+                    .ignoresSafeArea()
 
-                Image(.whiteLogo)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 200)
-                    .padding(.bottom, 30)
+                VStack(alignment: .center, spacing: 30) {
 
-                VStack(spacing: 0) {
+                    Spacer()
 
-                    TextField("Email", text: $loginVM.email)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(TextInputAutocapitalization.never)
-                        .autocorrectionDisabled()
-                        .padding()
+                    Image(.splashLogo)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 200)
+                        .padding(.bottom, 30)
 
-                    Divider()
+                    VStack(spacing: 0) {
 
-                    SecureField("Password", text: $loginVM.password)
-                        .textInputAutocapitalization(TextInputAutocapitalization.never)
-                        .autocorrectionDisabled()
-                        .padding()
-                    
-                }.background(
-                    Color.white, in: RoundedRectangle(cornerRadius: 10)
-                )
-                .padding()
+                        TextField("Email", text: $loginVM.email)
+                            .foregroundStyle(Color.textPrimary)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(
+                                TextInputAutocapitalization.never
+                            )
+                            .autocorrectionDisabled()
+                            .padding()
 
-                VStack(alignment: .trailing, spacing: 20) {
+                        Divider()
 
-                    Button {
-                        
-                        Task {
-                            await self.loginVM.isLogin()
+                        SecureField("Password", text: $loginVM.password)
+                            .foregroundStyle(Color.textPrimary)
+                            .textInputAutocapitalization(
+                                TextInputAutocapitalization.never
+                            )
+                            .autocorrectionDisabled()
+                            .padding()
+
+                    }.background {
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.appSecondary)
+                    }.padding()
+
+                    VStack(alignment: .trailing, spacing: 20) {
+
+                        Button {
+
+                            Task {
+                                await self.loginVM.isLogin()
+                            }
+
+                        } label: {
+
+                            ZStack {
+
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.brandPrimary)
+                                    .frame(height: 52)
+
+                                if loginVM.isLoding {
+                                    ProgressView().tint(Color.white)
+                                } else {
+                                    Text("Log in")
+                                        .foregroundStyle(Color(.white))
+                                        .font(.headline)
+
+                                }
+
+                            }
+
                         }
-                        
-                    } label: {
+                        .disabled(loginVM.isLoginDisabled || loginVM.isLoding)
+                        .opacity(
+                            (loginVM.isLoginDisabled || loginVM.isLoding)
+                                ? 0.5 : 1)
 
-                        if loginVM.isLoding {
-                            ProgressView().tint(Color.brandNavy)
-                        } else {
-                            Text("Log in")
-                                .foregroundStyle(Color(.brandNavy))
-                                .font(.headline)
+                        HStack(alignment: .center) {
+
+                            NavigationLink {
+                                ForgotPasswordView()
+                            } label: {
+                                Text("Forgot password?")
+                                    .foregroundStyle(Color.brandPrimary)
+                                    .font(.title3)
+                            }
 
                         }
 
                     }.padding()
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            Color.white,
-                            in: RoundedRectangle(cornerRadius: 10)
-                        )
-                        .disabled(loginVM.isLoginDisabled || loginVM.isLoding)
-                        .opacity((loginVM.isLoginDisabled || loginVM.isLoding ) ? 0.5 : 1)
 
-                    HStack(alignment: .center) {
-                        Button {
-
-                        } label: {
-                            Text("Forgot password?")
-                                .foregroundStyle(.white)
-                                .font(.footnote)
-                        }
-                    }
-
-                }.padding()
-
-                Spacer()
+                    Spacer()
+                }
+            }.alert(
+                loginVM.validationError,
+                isPresented: $loginVM.showValidationMessage
+            ) {
+                Button("OK") {
+                    loginVM.validationError = ""
+                    loginVM.isLoding = false
+                    loginVM.showValidationMessage = false
+                }
             }
-        }.alert(
-            loginVM.validationError, isPresented: $loginVM.showValidationMessage
-        ) {
-            Button("OK") {
-                loginVM.validationError = ""
-                loginVM.isLoding = false
-                loginVM.showValidationMessage = false
-            }
+
         }
+
     }
 }
 
