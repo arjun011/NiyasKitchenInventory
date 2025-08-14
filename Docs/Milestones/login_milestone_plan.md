@@ -57,7 +57,7 @@
 - Offline with valid session enters app with banner; without session shows login  
 ---
 
-## 4) Forgot Password Flow
+## 3) Forgot Password Flow
 **Labels:** `feature`, `auth`, `ui`  
 **Branch:** `feature/forgot-password`
 
@@ -74,55 +74,7 @@
 
 ---
 
-## 5) User Roles Fetch & Gate
-**Labels:** `feature`, `auth`, `security`  
-**Branch:** `feature/roles-and-gating`
-
-**Checklist**
-- [ ] On successful sign-in, fetch `/users/{uid}` (role, isDisabled, displayName)  
-- [ ] If `isDisabled == true` → sign out + disabled message  
-- [ ] Store role in app state for feature gating  
-- [ ] Hide/disable restricted actions by role (scaffold only for now)  
-
-**Acceptance Criteria**
-- Disabled users cannot enter the app  
-- Role is available in memory; restricted UI is hidden/disabled  
-
----
-
-## 6) Security Rules (Auth + Roles)
-**Labels:** `security`, `backend`, `auth`  
-**Branch:** `chore/security-rules-auth`
-
-**Checklist**
-- [ ] Firestore rules: only authenticated reads/writes  
-- [ ] Restrict write paths by role (scaffold for future collections)  
-- [ ] Add local Firebase Emulator config for tests  
-- [ ] Document how to run emulator  
-
-**Acceptance Criteria**
-- Unauthed reads/writes are denied  
-- Role-based checks in rules compile & pass emulator tests  
-
----
-
-## 7) Error Copy & UX Polish
-**Labels:** `ux`, `copy`, `polish`  
-**Branch:** `chore/login-copy-polish`
-
-**Checklist**
-- [ ] Finalize friendly, non-technical error strings  
-- [ ] Consistent tone and capitalization  
-- [ ] Ensure error placement matches design  
-- [ ] Add empty/error state screenshots for README  
-
-**Acceptance Criteria**
-- Error strings approved and consistent  
-- Errors are visible in the intended UI area  
-
----
-
-## 8) Login Module Tests
+## 4) Login Module Tests
 **Labels:** `test`, `quality`  
 **Branch:** `test/login-module`
 
