@@ -62,10 +62,10 @@
 **Branch:** `feature/forgot-password`
 
 **Checklist**
-- [ ] Forgot Password screen with email field  
-- [ ] Send reset link via Auth service  
-- [ ] Neutral success message regardless of account existence  
-- [ ] Error state only for network issues  
+- ✅ Forgot Password screen with email field  
+- ✅ Send reset link via Auth service  
+- ✅ Neutral success message regardless of account existence  
+- ✅ Error state only for network issues  
 
 **Acceptance Criteria**
 - Entering any email shows neutral success message  
