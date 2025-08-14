@@ -130,8 +130,7 @@
 - [ ] Unit tests: validators (email, password)  
 - [ ] Unit tests: AuthService success/failure  
 - [ ] Unit tests: session gate routing  
-- [ ] UI test: happy path sign-in → Dashboard  
-- [ ] UI test: wrong password shows error  
+ 
 
 **Acceptance Criteria**
 - All tests pass locally  

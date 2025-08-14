@@ -66,18 +66,14 @@
 		DCC1C4072E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Feature/Dashboard/Views/DashboardView.swift,
 				"GoogleService-Info.plist",
-				RootView.swift,
 			);
 			target = DCC1C3D82E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */;
 		};
 		DCC1C4082E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Feature/Dashboard/Views/DashboardView.swift,
 				"GoogleService-Info.plist",
-				RootView.swift,
 			);
 			target = DCC1C3E22E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */;
 		};
