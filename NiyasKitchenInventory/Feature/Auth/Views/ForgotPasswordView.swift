@@ -70,7 +70,7 @@ struct ForgotPasswordView: View {
                             dismiss()
                         } label: {
                             Image(systemName: "chevron.left")
-                                .tint(Color.appPrimary)
+                                .tint(Color.brandPrimary)
                         }
 
                     }
