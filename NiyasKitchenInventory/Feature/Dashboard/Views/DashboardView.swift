@@ -13,7 +13,6 @@ struct DashboardView: View {
         VStack {
             Button("SignOut") {
                 Task {
-                    
                     await session.signOut()
                 }
                 
@@ -24,4 +23,5 @@ struct DashboardView: View {
 
 #Preview {
     DashboardView()
+        .environment(AppSession())
 }

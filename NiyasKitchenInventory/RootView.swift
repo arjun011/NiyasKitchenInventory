@@ -20,7 +20,7 @@ struct RootView: View {
                     ProgressView().tint(.white)
                 }
             } else if session.isAuthenticated {
-                DashboardView()  // your main app shell
+                TabShellView()  // your main app shell
             } else {
                 LoginView()  // your finished login screen
             }
