@@ -26,9 +26,10 @@ struct TabShellView: View {
                 }
             }
 
-            Tab("Inventory", systemImage: "shippingbox.fill", value: .inventory)
-            {
-                Text("Inventory")
+            Tab("Inventory", systemImage: "shippingbox.fill", value: .inventory) {
+                NavigationStack {
+                    InventoryListView()
+                }
             }
 
             Tab(
