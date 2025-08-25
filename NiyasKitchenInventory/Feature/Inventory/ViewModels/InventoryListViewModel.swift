@@ -50,7 +50,7 @@ import Foundation
         }
         
         if sortedByNewToOld {
-            filteredByName.sort { $0.lastUpdated > $1.lastUpdated }
+            filteredByName.sort { $0.updatedAt > $1.updatedAt }
         }
         
         

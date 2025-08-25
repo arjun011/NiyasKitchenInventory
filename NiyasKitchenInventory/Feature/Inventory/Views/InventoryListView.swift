@@ -34,11 +34,10 @@ struct InventoryListView: View {
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-
+                NavigationLink {
+                    AddEditInventoryView()
                 } label: {
                     Image(systemName: "plus.circle.fill")
-
                 }.tint(Color.brandPrimary)
 
             }
