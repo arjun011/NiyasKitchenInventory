@@ -40,7 +40,7 @@ import Foundation
         if trimmed.isEmpty { return false }
         
         if quantity <= 0 { return false }
-        if lowStockThreshold >= quantity { return false }
+        if lowStockThreshold <= 0 { return false }
         if selectedUnit == nil { return false }
         if selectedCategory == nil { return false }
         if selectedSupplier == nil {return false}
@@ -59,7 +59,7 @@ import Foundation
             self.selectedUnit = self.units.first
             print(units.count)
         } catch {
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
         }
     }
     
@@ -88,26 +88,25 @@ import Foundation
         
         do {
             let _ =  try await service.saveInventory(inventory: inventory)
-            self.dispalyErrorMessage(message: "Item added successfully")
+            self.displayErrorMessage(message: "Item added successfully")
             self.resetValues()
 
         }catch {
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
         }
     }
     
 }
 
-//MARK: - CateGoery -
+//MARK: - Category -
 
 extension AddEditInventoryViewModel {
 
-    func getCategoeryList() async {
+     func getCategoryList() async {
         do {
             self.categories = try await service.fetchCategoryList()
         } catch {
-        
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
         }
     }
 
@@ -123,7 +122,7 @@ extension AddEditInventoryViewModel {
 
         } catch {
             
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
 
         }
 
@@ -139,7 +138,7 @@ extension AddEditInventoryViewModel {
         do {
             self.suppliers = try await service.fetchSupplierList()
         } catch {
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
 
         }
     }
@@ -153,7 +152,7 @@ extension AddEditInventoryViewModel {
             self.selectedSupplier = newSupplier
         } catch {
             
-            self.dispalyErrorMessage(message: error.localizedDescription)
+            self.displayErrorMessage(message: error.localizedDescription)
         }
 
     }
@@ -163,8 +162,8 @@ extension AddEditInventoryViewModel {
 
 //MARK: - Error message -
 extension AddEditInventoryViewModel {
-    
-    func dispalyErrorMessage(message:String) {
+         
+    func displayErrorMessage(message:String) {
         self.showError = true
         self.errorMessage = message
     }

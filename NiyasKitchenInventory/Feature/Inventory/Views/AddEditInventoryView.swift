@@ -131,7 +131,7 @@ struct AddEditInventoryView: View {
                     await withTaskGroup(of: Void.self) { group in
                         group.addTask { await vm.getUnits() }
                         group.addTask { await vm.getSupplierList() }
-                        group.addTask { await vm.getCategoeryList() }
+                        group.addTask { await vm.getCategoryList() }
                     }
 
                 }

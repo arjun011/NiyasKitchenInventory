@@ -31,11 +31,11 @@ final class AddEditInventoryServices {
 
 
     // Generic function for SaveData on FireStore Collection
-    func saveData<T:Codable>(collection: String, newSupplier : T) async throws -> T {
+    func saveData<T:Codable>(collection: String, object : T) async throws -> T {
 
         let uuid = UUID().uuidString
         let docRef = db.collection(collection).document(uuid)
-        try docRef.setData(from: newSupplier, merge: false)
+        try docRef.setData(from: object, merge: false)
         try await docRef.updateData([
             "createdAt": FieldValue.serverTimestamp(),
             "updatedAt": FieldValue.serverTimestamp(),
@@ -44,8 +44,8 @@ final class AddEditInventoryServices {
 
         // 4) Read back (optional) or map locally
         let snap = try await docRef.getDocument()
-        let saved = try snap.data(as: T.self)
-        return saved
+        return try snap.data(as: T.self)
+        
     }
    
     func saveInventory(inventory: InventoryItemModel) async throws -> InventoryItemModel {
