@@ -67,6 +67,7 @@ struct FilterBarView: View {
                         FilterToggleLabelView(icon: "exclamationmark.triangle.fill" , title: "Last Updated (new → old)", isOn: $sortedByNewToOld)
                     }
                 }).padding(.vertical, 8)
+            
         }
     }
 }

@@ -13,23 +13,38 @@ struct InventoryListView: View {
 
     var body: some View {
 
-        VStack {
+        ZStack {
 
-            // Filter bar
+            VStack {
 
-            FilterBarView(
-                suppliers: $vm.suppliers,
-                selectedSupplier: $vm.selectedSupplier,
-                showLowStockOnly: $vm.showLowStockOnly,
-                sortedByNewToOld: $vm.sortedByNewToOld,
-                showStaleOnly: $vm.showStaleOnly
-            ).padding(.horizontal, 12)
-                .layoutPriority(1)
+                // Filter bar
 
-            // List of Items
-            checkFilterItemsMatch()
+                FilterBarView(
+                    suppliers: $vm.suppliers,
+                    selectedSupplier: $vm.selectedSupplier,
+                    showLowStockOnly: $vm.showLowStockOnly,
+                    sortedByNewToOld: $vm.sortedByNewToOld,
+                    showStaleOnly: $vm.showStaleOnly
+                ).padding(.horizontal, 12)
+                    .layoutPriority(1)
+                    .task {
+                        await vm.getSupplierList()
+                    }
+
+                // List of Items
+                checkFilterItemsMatch()
+                    .task {
+                        await vm.getInventoryList()
+                    }
+            }.disabled(vm.isLoading)
+                .blur(radius: vm.isLoading ? 1 : 0.3)
+            if vm.isLoading {
+                ProgressView()
+                    .tint(Color.brandPrimary)
+            }
 
         }
+
         .navigationTitle("Inventory")
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
@@ -56,9 +71,11 @@ extension InventoryListView {
         if vm.filteredItems.isEmpty {
             return AnyView(
                 ContentUnavailableView {
-                    
-                    Label("No items match", systemImage: "text.page.badge.magnifyingglass")
-                    
+
+                    Label(
+                        "No items match",
+                        systemImage: "text.page.badge.magnifyingglass")
+
                 } description: {
                     Text("Try clearing filters or searching a different name.")
                 })

@@ -12,6 +12,7 @@ import Foundation
 
 @Observable final class AddEditInventoryViewModel {
 
+    var isLoading:Bool = false
     var name: String = ""
     var sku: String = ""
     var quantity: Double = 1
@@ -57,7 +58,6 @@ import Foundation
         do {
             self.units = try await service.fetchUnits()
             self.selectedUnit = self.units.first
-            print(units.count)
         } catch {
             self.displayErrorMessage(message: error.localizedDescription)
         }
@@ -73,6 +73,12 @@ import Foundation
     
     func saveInventory() async {
         
+        guard !isLoading else { return }
+        self.isLoading = true
+        
+        defer {
+            self.isLoading = false
+        }
         
         let inventory = InventoryItemModel(name: name,
                                            sku: sku,
@@ -87,6 +93,7 @@ import Foundation
                                            categoryName:selectedCategory?.name)
         
         do {
+            
             let _ =  try await service.saveInventory(inventory: inventory)
             self.displayErrorMessage(message: "Item added successfully")
             self.resetValues()
@@ -111,6 +118,13 @@ extension AddEditInventoryViewModel {
     }
 
     func saveCategory(category: InventoryCategoryModel) async {
+
+        guard !isLoading else { return }
+        self.isLoading = true
+        
+        defer {
+            self.isLoading = false
+        }
 
         do {
 
@@ -144,6 +158,13 @@ extension AddEditInventoryViewModel {
     }
 
     func saveSupplier(supplier: SupplierModel) async {
+
+        guard !isLoading else { return }
+        self.isLoading = true
+        
+        defer {
+            self.isLoading = false
+        }
 
         do {
             let newSupplier = try await service.saveNewSupplier(

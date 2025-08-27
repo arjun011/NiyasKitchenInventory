@@ -56,7 +56,7 @@ final class AddEditInventoryServices {
 
         guard snapshot.isEmpty else { throw GeneralError.duplicateName(inventory.name) }
 
-        let newInventory:InventoryItemModel = try await self.saveData(collection:"Inventories" , newSupplier: inventory)
+        let newInventory:InventoryItemModel = try await self.saveData(collection:"Inventories" , object: inventory)
         
         return newInventory
      
@@ -88,7 +88,7 @@ extension AddEditInventoryServices {
         ).getDocuments()
 
         guard snapshot.isEmpty else { throw GeneralError.duplicateName(newSupplier.name) }
-        let newSupplier:SupplierModel = try await self.saveData(collection:"suppliers" , newSupplier: newSupplier)
+        let newSupplier:SupplierModel = try await self.saveData(collection:"suppliers" , object: newSupplier)
         return newSupplier
     }
 
@@ -124,7 +124,7 @@ extension AddEditInventoryServices {
 
         guard snapshot.isEmpty else { throw GeneralError.duplicateName(category.name) }
 
-        let newCategory:InventoryCategoryModel = try await self.saveData(collection:"Categories" , newSupplier: category)
+        let newCategory:InventoryCategoryModel = try await self.saveData(collection:"Categories" , object: category)
         
         return newCategory
      

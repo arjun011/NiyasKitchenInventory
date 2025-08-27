@@ -6,11 +6,22 @@
 //
 
 import Foundation
+import Firebase
+import FirebaseCore
+import FirebaseFirestore
 
-//struct InventoryListServices {
-//
-//    func formattedQty(_ q: Double) -> String {
-//        q == floor(q) ? String(Int(q)) : String(format: "%.1f", q)
-//    }
-//
-//}
+class InventoryListServices {
+
+    private let db = Firestore.firestore()
+    
+    func fetchInventory() async throws -> [InventoryItemModel] {
+     
+        let snapshot = try await db.collection("Inventories").getDocuments()
+        let inventories = try snapshot.documents.compactMap { doc in
+            try doc.data(as: InventoryItemModel.self)
+        }
+        return inventories
+        
+    }
+
+}
