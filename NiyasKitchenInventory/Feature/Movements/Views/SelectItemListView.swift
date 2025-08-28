@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct SelectItemListView: View {
-    
-    @State var itemsList:[InventoryItemModel] = mockInventory
-    var selectedRow:(InventoryItemModel) -> Void
-    @State var searchByName:String = ""
-    
-    var filteredList:[InventoryItemModel] {
-        
+
+    @Environment(\.dismiss) var dismiss
+    @State var itemsList: [InventoryItemModel] = mockInventory
+    var selectedRow: (InventoryItemModel) -> Void
+    @State var searchByName: String = ""
+
+    var filteredList: [InventoryItemModel] {
+
         var filteredByName = itemsList
 
         // Search by name/SKU
@@ -25,42 +26,48 @@ struct SelectItemListView: View {
                 $0.name.lowercased().contains(q)
             }
         }
-        
         return filteredByName
     }
-    
+
     var body: some View {
-        
-        VStack {
-            
-            List(self.filteredList) { item in
-                
-                VStack(alignment: .leading, content: {
-                    
-                    Text("\(item.name)")
-                        .fontWeight(.semibold)
-                    Text("current : \(item.formattedQuantity) \(item.unit)")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }).onTapGesture {
-                    selectedRow(item)
+
+        NavigationStack {
+
+            VStack {
+
+                List(self.filteredList) { item in
+
+                    HStack {
+
+                        VStack(
+                            alignment: .leading,
+                            content: {
+
+                                Text("\(item.name)")
+                                    .fontWeight(.semibold)
+                                Text(
+                                    "current : \(item.formattedQuantity) \(item.unit)"
+                                )
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            })
+                        Spacer()
+                    }.contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedRow(item)
+                            dismiss()
+                        }
                 }
-                
-            }
-            
-            
-        }.searchable(text: $searchByName)
-        
+
+            }.searchable(text: $searchByName)
+        }
     }
 }
 
 #Preview {
-    
-    NavigationStack {
-        SelectItemListView { selectedItem in
-            print(selectedItem)
-        }
+
+    SelectItemListView { selectedItem in
+        print(selectedItem)
     }
-    
-    
+
 }

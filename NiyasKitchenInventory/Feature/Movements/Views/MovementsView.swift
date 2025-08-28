@@ -8,18 +8,27 @@
 import SwiftUI
 
 struct MovementsView: View {
+    
+    @State private var vm = MovementsViewModel()
+    
     var body: some View {
        
         VStack {
         
-        }.navigationTitle("Movements")
+        }.sheet(isPresented: $vm.showInventoryList, content: {
+            SelectItemListView { selectedInventory in
+                print(selectedInventory.name)
+                
+            }
+        })
+        .navigationTitle("Movements")
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    
+                    vm.showInventoryList.toggle()
                 } label: {
-                    Image(systemName: "Plus.fill")
+                    Image(systemName: "plus.circle")
                         .tint(Color.brandPrimary)
                 }
 
