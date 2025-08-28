@@ -16,9 +16,6 @@ struct AddSupplierView: View {
     @Environment(\.dismiss) private var dismiss
     private var isValid: Bool {
         let namaV = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        //        let emailV = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        //        let numberV = contactNumber.trimmingCharacters(in: .whitespacesAndNewlines)
-
         return namaV.isEmpty
     }
 
