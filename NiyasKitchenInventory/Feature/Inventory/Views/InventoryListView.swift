@@ -37,7 +37,7 @@ struct InventoryListView: View {
                         await vm.getInventoryList()
                     }
             }.disabled(vm.isLoading)
-                .blur(radius: vm.isLoading ? 1 : 0.3)
+                .opacity(vm.isLoading ? 0.5 : 1)
             if vm.isLoading {
                 ProgressView()
                     .tint(Color.brandPrimary)

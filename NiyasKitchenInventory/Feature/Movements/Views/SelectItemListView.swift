@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct SelectItemListView: View {
-
+    
     @Environment(\.dismiss) var dismiss
-    @State var itemsList: [InventoryItemModel] = mockInventory
-    var selectedRow: (InventoryItemModel) -> Void
+    private let service:InventoryListServices = InventoryListServices()
     @State var searchByName: String = ""
-
+    @State var inventoryItems: [InventoryItemModel] = []
+    var selectedRow: (InventoryItemModel) -> Void
+    
     var filteredList: [InventoryItemModel] {
 
-        var filteredByName = itemsList
+        var filteredByName = inventoryItems
 
         // Search by name/SKU
         let q = searchByName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -60,6 +61,13 @@ struct SelectItemListView: View {
                 }
 
             }.searchable(text: $searchByName)
+                .task {
+                    do {
+                        self.inventoryItems = try await service.fetchInventory()
+                    } catch {
+                        print("Error =\(error)")
+                    }
+                }
         }
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - ROUTING
 
-enum MovementType: String, CaseIterable, Identifiable, Hashable {
+enum MovementType11: String, CaseIterable, Identifiable, Hashable {
     case all = "ALL", `in` = "IN", out = "OUT", waste = "WASTE"
     var id: String { rawValue }
     var icon: String {
@@ -49,7 +49,7 @@ struct DemoItem: Identifiable, Hashable {
 struct DemoMovement: Identifiable, Hashable {
     let id = UUID()
     let item: DemoItem
-    let type: MovementType
+    let type: MovementType11
     let qty: Double
     let note: String?
     let date: Date
@@ -144,7 +144,7 @@ struct MovementsListView: View {
     let onTapRow: (DemoMovement) -> Void
     let onTapAdd: () -> Void
 
-    @State private var type: MovementType = .all
+    @State private var type: MovementType11 = .all
     @State private var range: RangeFilter = .today
     @State private var query: String = ""
 
@@ -164,7 +164,7 @@ struct MovementsListView: View {
         VStack(spacing: 0) {
             // Filters
             Picker("Type", selection: $type) {
-                ForEach(MovementType.allCases) { t in Text(t.rawValue).tag(t) }
+                ForEach(MovementType11.allCases) { t in Text(t.rawValue).tag(t) }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
@@ -337,7 +337,7 @@ struct AddMovementView: View {
     let onSave: (DemoMovement) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var type: MovementType = .in
+    @State private var type: MovementType11 = .in
     @State private var qty: String = ""
     @State private var note: String = ""
     @State private var supplier: String? = nil
@@ -361,7 +361,7 @@ struct AddMovementView: View {
             }
             Section("Type") {
                 Picker("Type", selection: $type) {
-                    ForEach([MovementType.in, .out, .waste]) { t in
+                    ForEach([MovementType11.in, .out, .waste]) { t in
                         Text(t.rawValue).tag(t)
                     }
                 }
@@ -437,7 +437,7 @@ struct AddMovementView: View {
 struct ItemDetailView: View {
     let item: DemoItem
     let onSeeAll: () -> Void
-    let onQuickAdd: (MovementType) -> Void
+    let onQuickAdd: (MovementType11) -> Void
 
     var isLow: Bool { item.quantity <= item.lowStock }
 
@@ -531,7 +531,7 @@ struct ItemMovementsListView: View {
     let item: DemoItem
     let all: [DemoMovement]
 
-    @State private var type: MovementType = .all
+    @State private var type: MovementType11 = .all
     @State private var range: RangeFilter = .d7
 
     var filtered: [DemoMovement] {
@@ -561,7 +561,7 @@ struct ItemMovementsListView: View {
             .padding([.horizontal, .top])
 
             Picker("Type", selection: $type) {
-                ForEach(MovementType.allCases) { t in Text(t.rawValue).tag(t) }
+                ForEach(MovementType11.allCases) { t in Text(t.rawValue).tag(t) }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)

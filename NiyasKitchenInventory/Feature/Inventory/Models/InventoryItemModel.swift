@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct InventoryItemModel: Identifiable, Codable {
+struct InventoryItemModel: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var sku: String?

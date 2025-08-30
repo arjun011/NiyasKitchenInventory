@@ -36,7 +36,9 @@ struct TabShellView: View {
                 "Movements", systemImage: "arrow.left.arrow.right",
                 value: .movements
             ) {
-                Text("Movements")
+                
+                    MovementsView()
+                
             }
 
             Tab("Reports", systemImage: "chart.bar.fill", value: .reports) {
