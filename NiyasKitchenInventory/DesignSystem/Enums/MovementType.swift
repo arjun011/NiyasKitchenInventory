@@ -18,6 +18,7 @@ enum MovementType: String, CaseIterable, Identifiable {
         case .in: return "arrow.down.circle.fill"
         case .out: return "arrow.up.circle.fill"
         case .waste: return "trash.circle.fill"
+        default: return ""
         }
     }
     var tint: Color {
@@ -25,6 +26,7 @@ enum MovementType: String, CaseIterable, Identifiable {
         case .in: return .brandPrimary
         case .out: return .appWarning
         case .waste: return .appDanger
+        default: return Color.clear
         }
     }
     
@@ -36,6 +38,7 @@ enum MovementType: String, CaseIterable, Identifiable {
         }
     }
 
+    case all = "ALL"
     case `in` = "IN"
     case out = "OUT"
     case waste = "WASTE"

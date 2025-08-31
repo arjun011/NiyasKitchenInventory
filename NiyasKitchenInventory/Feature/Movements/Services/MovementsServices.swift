@@ -11,7 +11,6 @@ final class MovementsServices {
     
     enum GeneralError: LocalizedError {
         case inventoryMissing(String)
-        case updatedSu
         case duplicateName(String)
         case firestore(String)
         case wouldGoNegative
@@ -20,7 +19,6 @@ final class MovementsServices {
             switch self {
             case .inventoryMissing(let name) :
                 return "\(name) inventory missing"
-            case .updatedSu: return "Supplier name is required."
             case .duplicateName(let name):
                 return "A \(name) already exists."
             case .wouldGoNegative:
@@ -61,7 +59,7 @@ final class MovementsServices {
     }
     
     
-    func updateInventory(movement: MovementModel) async throws {
+    private func updateInventory(movement: MovementModel) async throws {
         
         let docRef = db.collection("Inventories").document(movement.itemId)
         let snap = try await docRef.getDocument()

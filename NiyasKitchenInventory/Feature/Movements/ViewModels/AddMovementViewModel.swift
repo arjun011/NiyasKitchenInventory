@@ -9,8 +9,6 @@ import Foundation
 
 @Observable final class AddMovementViewModel {
     
-    
-    
     var quantity:String = ""
     var typesOfMovement:MovementType = .in
     var selectedSupplier:SupplierModel? = nil
@@ -19,28 +17,36 @@ import Foundation
     private let inventoryService = AddEditInventoryServices()
     private let service = MovementsServices()
     
+    var isLoading:Bool = false
+    var alertMessage:String?
+    var showMessage:Bool = false
     var isValidate:Bool {
-        
         if (Double(quantity) ?? 0) <= 0 { return false}
-        
         return true
     }
     
-    
-    
     func getSupplierList() async {
+        
+        isLoading = true
+        defer {
+            isLoading = false
+        }
         
         do {
             self.suppliers = try await inventoryService.fetchSupplierList()
-            print("Suppliers count :\(suppliers.count)")
-            
         }catch {
-            print(error)
+            showAlertMessage(message: error.localizedDescription)
         }
     }
     
     func saveMovement(inventory: InventoryItemModel,profile: UserProfile?) async {
      
+        
+        isLoading = true
+        defer {
+            isLoading = false
+        }
+        
         let movement = MovementModel(itemId: inventory.id.uuidString,
                                      itemName: inventory.name,
                                      type: self.typesOfMovement.rawValue,
@@ -57,9 +63,17 @@ import Foundation
         do {
            let _ = try await service.saveMovement(movement: movement)
             print("Movement Saved")
+            self.showAlertMessage(message: "Movement added successfully")
         }catch {
-            print(error.localizedDescription)
+            showAlertMessage(message: error.localizedDescription)
         }
+    }
+    
+    
+    private func showAlertMessage(message: String) {
+        self.alertMessage = message
+        self.showMessage = true
+        
     }
     
 }
