@@ -32,6 +32,18 @@ final class MovementsServices {
 
     private let db = Firestore.firestore()
     
+    
+    func fetchMovements() async throws -> [MovementModel] {
+        
+        let snapshot = try await db.collection("Movements").getDocuments()
+        let movenemts = try snapshot.documents.compactMap { doc in
+            try doc.data(as: MovementModel.self)
+        }
+        return movenemts
+        
+    }
+    
+    
     func saveMovement(movement: MovementModel) async throws  -> MovementModel{
         
         try await self.updateInventory(movement: movement)

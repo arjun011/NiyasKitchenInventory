@@ -124,5 +124,6 @@ struct AddMovementView1: View {
     
     NavigationStack {
         AddMovementView1(inventory: mockInventory.first!)
+            .environment(AppSession())
     }
 }

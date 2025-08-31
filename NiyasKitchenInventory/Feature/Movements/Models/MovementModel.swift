@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseCore
 
-struct MovementModel: Codable {
+struct MovementModel: Codable, Identifiable {
     var id:UUID = UUID()
     var itemId:String
     var itemName:String
@@ -21,5 +21,13 @@ struct MovementModel: Codable {
     var supplierName:String?
     var createdAt:Date
     var createdBy:String
+    var mType:MovementType {
+        return (MovementType(rawValue: type) ?? .in)
+    }
     
+    var displayQuantityFormate:String {
+        
+        return "\(mType.sign)" + String(format: "%.2f", quantity) + " \(unitName)"
+        
+    }
 }
