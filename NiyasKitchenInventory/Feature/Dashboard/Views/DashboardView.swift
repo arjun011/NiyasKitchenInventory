@@ -8,19 +8,22 @@
 import SwiftUI
 
 struct DashboardView: View {
+    
     @Environment(AppSession.self) private var session
+    @State private var vm = DashboardViewModel()
+    
     var body: some View {
         
         ScrollView {
          
             VStack(alignment: .leading, spacing: 16) {
-                KIPStatCardView(title: "Total Items", value: 100, icon: "cube.box.fill", bgColor: Color.brandPrimary)
+                KIPStatCardView(title: "Total Items", value: vm.totalInventoryCount, icon: "cube.box.fill", bgColor: Color.brandPrimary)
                 
-                KIPStatCardView(title: "Low Stock", value: 7, icon: "exclamationmark.triangle.fill", bgColor: Color.appWarning)
+                KIPStatCardView(title: "Low Stock", value: vm.lowStockInventoryCount, icon: "exclamationmark.triangle.fill", bgColor: Color.appWarning)
                 
-                KIPStatCardView(title: "Needs Review (7d)", value: 7, icon: "clock.fill", bgColor: Color.brandPrimary)
+                KIPStatCardView(title: "Needs Review (7d)", value: vm.staleInventoryCount, icon: "clock.fill", bgColor: Color.brandPrimary)
                 
-                KIPStatCardView(title: "Waste This Week", value: 7, icon: "trash.fill", bgColor: Color.appDanger)
+                KIPStatCardView(title: "Waste This Week", value: vm.wasteLastSevenDayCount, icon: "trash.fill", bgColor: Color.appDanger)
                 
                 VStack(alignment: .leading, content: {
                    
@@ -54,6 +57,11 @@ struct DashboardView: View {
                 }
             }
             
+        }.task {
+            await withTaskGroup(of: Void.self) { group in
+                   group.addTask { await vm.getInventoryList() }
+                   group.addTask { await vm.getWasteCount() }
+               }
         }
     }
 }

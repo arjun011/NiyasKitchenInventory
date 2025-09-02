@@ -85,4 +85,12 @@ final class MovementsServices {
         
     }
     
+    func countWastMovementsSince(_ date: Date) async throws -> Int {
+            let snapshot = try await db.collection("Movements")
+            .whereField("createdAt", isGreaterThanOrEqualTo: Timestamp(date: date)).whereField("type", isEqualTo: MovementType.waste.rawValue)
+                .getDocuments()
+
+            return snapshot.documents.count
+        }
+    
 }
