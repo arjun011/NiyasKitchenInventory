@@ -53,7 +53,7 @@ struct AddMovementView1: View {
 
                     TextField("Enter Quantity", text: $vm.quantity)
                         .keyboardType(.decimalPad)
-
+                    
                 } header: {
                     Text("QUANTITY")
                 }
