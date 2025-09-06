@@ -23,7 +23,7 @@ struct DashboardView: View {
                 
                 KIPStatCardView(title: "Needs Review (7d)", value: vm.staleInventoryCount, icon: "clock.fill", bgColor: Color.brandPrimary)
                 
-//                KIPStatCardView(title: "Waste This Week", value: vm.wasteLastSevenDayCount, icon: "trash.fill", bgColor: Color.appDanger)
+                KIPStatCardView1(title: "Waste This Week", value: vm.wasteLastSevenDayCount, icon: "trash.fill", bgColor: Color.appDanger)
                 
                 VStack(alignment: .leading, content: {
                    
