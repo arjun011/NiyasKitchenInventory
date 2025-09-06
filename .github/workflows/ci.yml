@@ -1,22 +1,16 @@
-
-name: CI
-
-on:
-  push:
-    branches: [ main, feature/** ]
-  pull_request:
-
 jobs:
   build-test:
-    runs-on: macos-14  # GitHub's macOS runner with Xcode 16
+    runs-on: macos-14
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 16
+        run: sudo xcode-select -s "/Applications/Xcode_16.0.app"
 
       - name: Show Xcode version
         run: xcodebuild -version
 
-      - name: Cache Swift Packages
+      - name: Cache SPM
         uses: actions/cache@v4
         with:
           path: ~/Library/Developer/Xcode/DerivedData
@@ -24,7 +18,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Resolve SPM dependencies
+      - name: Resolve SPM
         run: xcodebuild -resolvePackageDependencies
 
       - name: Build
@@ -36,7 +30,7 @@ jobs:
             -configuration Debug \
             build
 
-      - name: Run tests
+      - name: Test
         run: |
           xcodebuild \
             -scheme "NiyasKitchenInventory" \
