@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CreatePOView: View {
 
+    @Environment(AppSession.self) private var session
     @State private var vm = CreatePOViewModel()
     var body: some View {
 
@@ -65,14 +66,11 @@ struct CreatePOView: View {
                     ForEach(vm.orderItemList) { item in
 
                         LabeledContent {
+                               Text("\(item.orderedQty ?? 0, format: .number) \(item.unitName)")
+                           } label: {
+                               Text(item.itemName)
+                           }
 
-                            Group {
-                                Text(item.orderedQty, format: .number)
-                                    + Text(" \(item.unitName)")
-                            }
-                        } label: {
-                            Text(item.itemName)
-                        }
                     }
 
                     NavigationLink {
@@ -115,6 +113,10 @@ struct CreatePOView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
 
+                        Task {
+                            await vm.saveDraftBy(userID: session.profile?.uid ?? "")
+                        }
+                        
                     } label: {
                         Text("Save Draft")
                             .foregroundStyle(Color.brandPrimary)
@@ -133,6 +135,7 @@ struct CreatePOView: View {
 
     NavigationStack {
         CreatePOView()
+            .environment(AppSession())
     }
 
 }

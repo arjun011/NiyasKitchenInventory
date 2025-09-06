@@ -6,29 +6,22 @@
 //
 
 import Foundation
+import FirebaseFirestore
+struct POLineModel: Codable, Identifiable, Hashable {
 
-struct POItemsModel: Codable, Identifiable, Hashable {
-
-    var id: UUID = UUID()
+    @DocumentID var id: String? 
     var itemName: String
     var unitName: String
     var receivedQty: Double?
     var lastReceivedAt: Date?
     var lowStockThreshold: Double?
-
-    private var _orderedQty: Double?
-
-    var orderedQty: Double {
-        get { _orderedQty ?? (lowStockThreshold ?? 0) * 2 }
-        set { _orderedQty = newValue }
-    }
+    var orderedQty: Double?
 
     enum CodingKeys: String, CodingKey {
         case id
         case itemName = "name"
         case unitName = "unit"
-        case _orderedQty = "orderedQty"
-        case receivedQty, lastReceivedAt, lowStockThreshold
+        case receivedQty, lastReceivedAt, lowStockThreshold,orderedQty
 
     }
 

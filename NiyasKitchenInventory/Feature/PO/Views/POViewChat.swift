@@ -8,21 +8,6 @@
 import SwiftUI
 
 
-enum POStatus: String, CaseIterable, Identifiable {
-    case all = "All", draft = "DRAFT", sent = "SENT", partial = "PARTIAL", received = "RECEIVED", closed = "CLOSED", canceled = "CANCELED"
-    var id: String { rawValue }
-    var chipColor: Color {
-        switch self {
-        case .draft: return .gray
-        case .sent: return .brandPrimary
-        case .partial: return .orange
-        case .received: return .green
-        case .closed: return .secondary
-        case .canceled: return .red
-        case .all: return .secondary
-        }
-    }
-}
 
 struct POListView: View {
     struct PO: Identifiable, Hashable {

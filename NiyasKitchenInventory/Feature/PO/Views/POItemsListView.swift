@@ -10,11 +10,11 @@ import SwiftUI
 struct POItemsListView: View {
 
     @Environment(\.dismiss) private var dismiss
-    @Binding var orderItemList: [POItemsModel]
-    @Binding var selections: Set<POItemsModel.ID>
+    @Binding var orderItemList: [POLineModel]
+    @Binding var selections: Set<POLineModel.ID>
 
     @State private var showQtyAlert = false
-    @State private var editingID: POItemsModel.ID?
+    @State private var editingID: POLineModel.ID?
     @State private var qtyText = ""
 
     //var onDone:([POItemsModel]) -> Void
@@ -24,22 +24,16 @@ struct POItemsListView: View {
 
             List(orderItemList, selection: $selections) { item in
 
-                HStack(
-                    alignment: .center,
-                    content: {
-                        Text(item.itemName)
-                        Spacer()
-
-                        Group {
-                            Text(item.orderedQty, format: .number)
-                                + Text(" \(item.unitName)")
-                        }.onTapGesture {
-                            editingID = item.id
-                            qtyText = String(item.orderedQty)
-                            showQtyAlert = true
-
-                        }
-                    })
+                HStack {
+                      Text(item.itemName)
+                      Spacer()
+                      Text("\(item.orderedQty ?? 0, format: .number) \(item.unitName)")
+                          .onTapGesture {
+                              editingID = item.id
+                              qtyText = String(item.orderedQty ?? 0)
+                              showQtyAlert = true
+                          }
+                  }
             }
 
         }.alert(
@@ -99,8 +93,8 @@ struct POItemsListView: View {
 
 #Preview {
 
-    @Previewable @State var items = [POItemsModel]()
-    @Previewable @State var selection = Set<POItemsModel.ID>()
+    @Previewable @State var items = [POLineModel]()
+    @Previewable @State var selection = Set<POLineModel.ID>()
     NavigationStack {
         POItemsListView(orderItemList: $items, selections: $selection)
     }

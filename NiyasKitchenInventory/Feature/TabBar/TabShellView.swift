@@ -42,7 +42,12 @@ struct TabShellView: View {
             }
 
             Tab("Reports", systemImage: "chart.bar.fill", value: .reports) {
-                Text("Reports")
+                
+                NavigationStack {
+                    CreatePOView()
+                }
+                
+                
             }
 
             Tab("Settings", systemImage: "gearshape.fill", value: .settings) {
