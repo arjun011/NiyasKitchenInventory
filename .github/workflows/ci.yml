@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  workflow_dispatch:        # run manually from Actions tab
+  workflow_dispatch:           # allow manual runs from the Actions tab
   push:
     branches: [ main, feature/** ]
   pull_request:
@@ -22,7 +22,7 @@ jobs:
             xcode: "15.4"
             xcode_app: "/Applications/Xcode_15.4.app"
             device: "iPhone 15 Pro"
-            allow_fail: true   # older Xcode may not open your project
+            allow_fail: true
     name: ${{ matrix.name }}
     continue-on-error: ${{ matrix.allow_fail }}
 
@@ -41,8 +41,7 @@ jobs:
         with:
           path: ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-spm-xcode${{ matrix.xcode }}-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-xcode${{ matrix.xcode }}-
+          restore-keys: ${{ runner.os }}-spm-xcode${{ matrix.xcode }}-
 
       - name: Resolve SPM
         run: xcodebuild -resolvePackageDependencies
