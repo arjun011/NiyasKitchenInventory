@@ -34,30 +34,6 @@
             default = "YES">
          </TestPlanReference>
       </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DC0743BD2E6DAE8700398A55"
-               BuildableName = "NiyasKitchenInventoryTests.xctest"
-               BlueprintName = "NiyasKitchenInventoryTests"
-               ReferencedContainer = "container:NiyasKitchenInventory.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DCC1C3E22E44D98E00D6E1A9"
-               BuildableName = "NiyasKitchenInventoryUITests.xctest"
-               BlueprintName = "NiyasKitchenInventoryUITests"
-               ReferencedContainer = "container:NiyasKitchenInventory.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

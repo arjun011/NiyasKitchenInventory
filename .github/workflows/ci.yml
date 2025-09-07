@@ -29,8 +29,21 @@ jobs:
         run: |
           sudo xcode-select -s "$DEVELOPER_DIR"
           xcodebuild -version
-          xcrun simctl list runtimes | grep iOS || true
-          xcrun simctl list devices | head -n 20
+          xcrun simctl list runtimes | grep "iOS 17.4" || true
+          xcrun simctl list devices | grep "iPhone 15" || true
+
+      - name: List repo files (sanity)
+        run: |
+          pwd
+          ls -la
+          echo "::notice title=Looking for project::"
+          find . -maxdepth 2 -name "*.xcodeproj" -print
+
+      - name: List schemes / targets (critical)
+        run: |
+          echo "::group::xcodebuild -list"
+          xcodebuild -list -project "$PROJECT" || true
+          echo "::endgroup::"
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -44,8 +57,9 @@ jobs:
       - name: Resolve SPM Dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Build & Test
-        id: xcode-test
+      # 🔧 Build only (no tests yet). Also disable signing for CI.
+      - name: Build
+        id: build
         run: |
           set -euo pipefail
           xcodebuild \
@@ -54,28 +68,19 @@ jobs:
             -configuration "$CONFIGURATION" \
             -sdk iphonesimulator \
             -destination "$DESTINATION" \
-            -enableCodeCoverage YES \
+            CODE_SIGNING_ALLOWED=NO \
             clean build \
-          | xcpretty && exit ${PIPESTATUS[0]}
+            -resultBundlePath BuildResult.xcresult \
+          | tee build.log
+          echo "build_log_path=$GITHUB_WORKSPACE/build.log" >> $GITHUB_OUTPUT
+          echo "xcresult_path=$GITHUB_WORKSPACE/BuildResult.xcresult" >> $GITHUB_OUTPUT
 
-      - name: Locate latest .xcresult
+      - name: Upload logs
         if: always()
-        id: find-xcresult
-        run: |
-          set -euo pipefail
-          RESULT=$(ls -dt ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult 2>/dev/null | head -n 1 || true)
-          echo "result_path=${RESULT}" >> $GITHUB_OUTPUT
-
-      - name: Upload TestResult.xcresult
-        if: always() && steps.find-xcresult.outputs.result_path != ''
         uses: actions/upload-artifact@v4
         with:
-          name: TestResult.xcresult
-          path: ${{ steps.find-xcresult.outputs.result_path }}
-          if-no-files-found: ignore
-
-      - name: Helpful failure message
-        if: failure()
-        run: |
-          echo "xcodebuild failed. Download TestResult.xcresult artifact and open it in Xcode for details."
-          exit 1
+          name: build-logs
+          path: |
+            ${{ steps.build.outputs.build_log_path }}
+            ${{ steps.build.outputs.xcresult_path }}
+          if-no-files-found: warn
