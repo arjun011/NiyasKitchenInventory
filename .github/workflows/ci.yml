@@ -2,48 +2,88 @@ name: CI
 
 on:
   push:
-    branches: [ main, feature, develop ]
+    branches: [ main, develop, feature ]
   pull_request:
-    branches: [ main, feature, develop ]
+    branches: [ main, develop, feature ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  PROJECT: NiyasKitchenInventory.xcodeproj
-  SCHEME: NiyasKitchenInventory
+  # === Tweak these to your repo ===
+  SCHEME: NiyasKitchenInventory         # make sure this scheme is Shared in Xcode
   CONFIGURATION: Debug
-  DESTINATION: platform=iOS Simulator,OS=17.4,name=iPhone 15
-  DEVELOPER_DIR: /Applications/Xcode_16.1.app
+  XCODE_VERSION: 16.1                   # runner has /Applications/Xcode_16.1.app
+  PREFERRED_RUNTIME: "iOS 17.4"         # we’ll fall back if missing
+  PREFERRED_DEVICE: "iPhone 15"
+  ENABLE_TESTS: "false"                 # set to "true" when you add tests
 
 jobs:
-  build-test:
+  build:
     runs-on: macos-15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode 16.1 & show versions
+      - name: Select Xcode and show versions
         run: |
-          sudo xcode-select -s "$DEVELOPER_DIR"
+          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
           xcodebuild -version
-          xcrun simctl list runtimes | grep "iOS 17.4" || true
-          xcrun simctl list devices | grep "iPhone 15" || true
+          echo "Available iOS runtimes:"
+          xcrun simctl list runtimes | grep iOS || true
+          echo "Some devices:"
+          xcrun simctl list devices | head -n 30 || true
 
-      - name: List repo files (sanity)
+      - name: Detect project/workspace & list schemes
+        id: probe
+        shell: bash
         run: |
-          pwd
-          ls -la
-          echo "::notice title=Looking for project::"
-          find . -maxdepth 2 -name "*.xcodeproj" -print
+          set -euo pipefail
 
-      - name: List schemes / targets (critical)
-        run: |
+          # Prefer workspace if present
+          WS=$(ls -1 *.xcworkspace 2>/dev/null | head -n1 || true)
+          PRJ=$(ls -1 *.xcodeproj 2>/dev/null | head -n1 || true)
+
+          if [[ -n "$WS" ]]; then
+            echo "projflag=-workspace \"$WS\"" >> $GITHUB_OUTPUT
+          elif [[ -n "$PRJ" ]]; then
+            echo "projflag=-project \"$PRJ\"" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No .xcworkspace or .xcodeproj found at repo root"; exit 1
+          fi
+
           echo "::group::xcodebuild -list"
-          xcodebuild -list -project "$PROJECT" || true
+          xcodebuild $([[ -n "$WS" ]] && echo "-workspace \"$WS\"" || echo "-project \"$PRJ\"") -list || true
           echo "::endgroup::"
+
+      - name: Pick a valid Simulator destination (auto-fallback)
+        id: dest
+        shell: bash
+        run: |
+          set -euo pipefail
+          WANT="platform=iOS Simulator,OS=${PREFERRED_RUNTIME#iOS },name=${PREFERRED_DEVICE}"
+          echo "Trying preferred destination: $WANT"
+
+          # Check if preferred destination exists
+          if xcrun simctl list devices | grep -q "${PREFERRED_DEVICE} .* (${PREFERRED_RUNTIME});"; then
+            DEST="$WANT"
+          else
+            echo "Preferred destination not found. Falling back to first available iPhone simulator…"
+            # Find first available iPhone simulator line like: iPhone 15 (XXXX) (Booted/Shutdown) (iOS 17.4)
+            LINE=$(xcrun simctl list devices available | grep -m1 -E "iPhone [0-9A-Za-z+ ]+ \(" || true)
+            if [[ -z "$LINE" ]]; then
+              echo "❌ No available iPhone Simulator found on runner."; exit 70
+            fi
+            # Extract name and runtime
+            NAME=$(echo "$LINE" | sed -E 's/^ *([^()]+) \(.+$/\1/')
+            RUNTIME=$(echo "$LINE" | sed -nE 's/.*\(iOS ([0-9.]+)\).*/\1/p')
+            DEST="platform=iOS Simulator,OS=$RUNTIME,name=$NAME"
+          fi
+
+          echo "destination=$DEST" >> $GITHUB_OUTPUT
+          echo "Using destination: $DEST"
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -55,32 +95,57 @@ jobs:
           restore-keys: spm-${{ runner.os }}-
 
       - name: Resolve SPM Dependencies
-        run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
-
-      # 🔧 Build only (no tests yet). Also disable signing for CI.
-      - name: Build
-        id: build
         run: |
-          set -euo pipefail
+          xcodebuild ${{ steps.probe.outputs.projflag }} -resolvePackageDependencies
+
+      - name: Build (no signing)
+        id: build
+        shell: bash
+        run: |
+          set -o pipefail
+          XCRESULT="$PWD/BuildResult.xcresult"
           xcodebuild \
-            -project "$PROJECT" \
+            ${{ steps.probe.outputs.projflag }} \
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
             -sdk iphonesimulator \
-            -destination "$DESTINATION" \
+            -destination "${{ steps.dest.outputs.destination }}" \
             CODE_SIGNING_ALLOWED=NO \
             clean build \
-            -resultBundlePath BuildResult.xcresult \
-          | tee build.log
-          echo "build_log_path=$GITHUB_WORKSPACE/build.log" >> $GITHUB_OUTPUT
-          echo "xcresult_path=$GITHUB_WORKSPACE/BuildResult.xcresult" >> $GITHUB_OUTPUT
+            -resultBundlePath "$XCRESULT" \
+            | tee "$PWD/build.log"
+          echo "build_log=$PWD/build.log" >> $GITHUB_OUTPUT
+          if [ -d "$XCRESULT" ]; then echo "xcresult=$XCRESULT" >> $GITHUB_OUTPUT; fi
 
-      - name: Upload logs
+      - name: (Optional) Test with a dummy target
+        if: env.ENABLE_TESTS == 'true'
+        id: test
+        shell: bash
+        run: |
+          set -o pipefail
+          XCRESULT="$PWD/TestResult.xcresult"
+          xcodebuild \
+            ${{ steps.probe.outputs.projflag }} \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination "${{ steps.dest.outputs.destination }}" \
+            -enableCodeCoverage YES \
+            test \
+            -resultBundlePath "$XCRESULT" \
+            | tee "$PWD/test.log"
+          echo "test_log=$PWD/test.log" >> $GITHUB_OUTPUT
+          if [ -d "$XCRESULT" ]; then echo "test_xcresult=$XCRESULT" >> $GITHUB_OUTPUT; fi
+
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
+          name: ci-artifacts
           path: |
-            ${{ steps.build.outputs.build_log_path }}
-            ${{ steps.build.outputs.xcresult_path }}
+            ${{ steps.build.outputs.build_log }}
+            ${{ steps.build.outputs.xcresult }}
+            ${{ steps.test.outputs.test_log }}
+            ${{ steps.test.outputs.test_xcresult }}
+            ~/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
           if-no-files-found: warn
