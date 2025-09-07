@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 struct POListView: View {
     struct PO: Identifiable, Hashable {
         let id = UUID()

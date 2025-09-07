@@ -33,7 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DCC1C3DA2E44D98E00D6E1A9 /* PBXContainerItemProxy */ = {
+		DC0743C22E6DAE8700398A55 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DCC1C3BC2E44D98C00D6E1A9 /* Project object */;
 			proxyType = 1;
@@ -50,25 +50,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DC0743BE2E6DAE8700398A55 /* NiyasKitchenInventoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NiyasKitchenInventoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC0744A42E6DDBB500398A55 /* NiyasKitchenInventory.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = NiyasKitchenInventory.xctestplan; sourceTree = "<group>"; };
 		DCC1C3C42E44D98C00D6E1A9 /* NiyasKitchenInventory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NiyasKitchenInventory.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DCC1C3D92E44D98E00D6E1A9 /* NiyasKitchenInventoryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NiyasKitchenInventoryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCC1C3E32E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NiyasKitchenInventoryUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DC0744A22E6DB21100398A55 /* Exceptions for "NiyasKitchenInventoryTests" folder in "NiyasKitchenInventoryTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CISmokeTests.swift,
+				NiyasKitchenInventoryTests.swift,
+			);
+			target = DC0743BD2E6DAE8700398A55 /* NiyasKitchenInventoryTests */;
+		};
 		DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = DCC1C3C32E44D98C00D6E1A9 /* NiyasKitchenInventory */;
-		};
-		DCC1C4072E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"GoogleService-Info.plist",
-			);
-			target = DCC1C3D82E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */;
 		};
 		DCC1C4082E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -80,11 +82,15 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DC0743BF2E6DAE8700398A55 /* NiyasKitchenInventoryTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NiyasKitchenInventoryTests;
+			sourceTree = "<group>";
+		};
 		DCC1C3C62E44D98C00D6E1A9 /* NiyasKitchenInventory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */,
-				DCC1C4072E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */,
 				DCC1C4082E47AEDB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryUITests" target */,
 			);
 			path = NiyasKitchenInventory;
@@ -92,6 +98,9 @@
 		};
 		DCC1C3DC2E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DC0744A22E6DB21100398A55 /* Exceptions for "NiyasKitchenInventoryTests" folder in "NiyasKitchenInventoryTests" target */,
+			);
 			path = NiyasKitchenInventoryTests;
 			sourceTree = "<group>";
 		};
@@ -103,6 +112,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DC0743BB2E6DAE8700398A55 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCC1C3C12E44D98C00D6E1A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,13 +149,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCC1C3D62E44D98E00D6E1A9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		DCC1C3E02E44D98E00D6E1A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -153,9 +162,11 @@
 		DCC1C3BB2E44D98C00D6E1A9 = {
 			isa = PBXGroup;
 			children = (
+				DC0744A42E6DDBB500398A55 /* NiyasKitchenInventory.xctestplan */,
 				DCC1C3C62E44D98C00D6E1A9 /* NiyasKitchenInventory */,
 				DCC1C3DC2E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */,
 				DCC1C3E62E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */,
+				DC0743BF2E6DAE8700398A55 /* NiyasKitchenInventoryTests */,
 				DCC1C3C52E44D98C00D6E1A9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -164,8 +175,8 @@
 			isa = PBXGroup;
 			children = (
 				DCC1C3C42E44D98C00D6E1A9 /* NiyasKitchenInventory.app */,
-				DCC1C3D92E44D98E00D6E1A9 /* NiyasKitchenInventoryTests.xctest */,
 				DCC1C3E32E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests.xctest */,
+				DC0743BE2E6DAE8700398A55 /* NiyasKitchenInventoryTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -173,6 +184,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DC0743BD2E6DAE8700398A55 /* NiyasKitchenInventoryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC0743C42E6DAE8700398A55 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventoryTests" */;
+			buildPhases = (
+				DC0743BA2E6DAE8700398A55 /* Sources */,
+				DC0743BB2E6DAE8700398A55 /* Frameworks */,
+				DC0743BC2E6DAE8700398A55 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC0743C32E6DAE8700398A55 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DC0743BF2E6DAE8700398A55 /* NiyasKitchenInventoryTests */,
+			);
+			name = NiyasKitchenInventoryTests;
+			packageProductDependencies = (
+			);
+			productName = NiyasKitchenInventoryTests;
+			productReference = DC0743BE2E6DAE8700398A55 /* NiyasKitchenInventoryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DCC1C3C32E44D98C00D6E1A9 /* NiyasKitchenInventory */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCC1C3ED2E44D98E00D6E1A9 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventory" */;
@@ -218,29 +252,6 @@
 			productReference = DCC1C3C42E44D98C00D6E1A9 /* NiyasKitchenInventory.app */;
 			productType = "com.apple.product-type.application";
 		};
-		DCC1C3D82E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DCC1C3F02E44D98E00D6E1A9 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventoryTests" */;
-			buildPhases = (
-				DCC1C3D52E44D98E00D6E1A9 /* Sources */,
-				DCC1C3D62E44D98E00D6E1A9 /* Frameworks */,
-				DCC1C3D72E44D98E00D6E1A9 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				DCC1C3DB2E44D98E00D6E1A9 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				DCC1C3DC2E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */,
-			);
-			name = NiyasKitchenInventoryTests;
-			packageProductDependencies = (
-			);
-			productName = NiyasKitchenInventoryTests;
-			productReference = DCC1C3D92E44D98E00D6E1A9 /* NiyasKitchenInventoryTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		DCC1C3E22E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DCC1C3F32E44D98E00D6E1A9 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventoryUITests" */;
@@ -274,12 +285,12 @@
 				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1610;
 				TargetAttributes = {
-					DCC1C3C32E44D98C00D6E1A9 = {
-						CreatedOnToolsVersion = 16.1;
-					};
-					DCC1C3D82E44D98E00D6E1A9 = {
+					DC0743BD2E6DAE8700398A55 = {
 						CreatedOnToolsVersion = 16.1;
 						TestTargetID = DCC1C3C32E44D98C00D6E1A9;
+					};
+					DCC1C3C32E44D98C00D6E1A9 = {
+						CreatedOnToolsVersion = 16.1;
 					};
 					DCC1C3E22E44D98E00D6E1A9 = {
 						CreatedOnToolsVersion = 16.1;
@@ -305,21 +316,21 @@
 			projectRoot = "";
 			targets = (
 				DCC1C3C32E44D98C00D6E1A9 /* NiyasKitchenInventory */,
-				DCC1C3D82E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */,
 				DCC1C3E22E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */,
+				DC0743BD2E6DAE8700398A55 /* NiyasKitchenInventoryTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		DCC1C3C22E44D98C00D6E1A9 /* Resources */ = {
+		DC0743BC2E6DAE8700398A55 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCC1C3D72E44D98E00D6E1A9 /* Resources */ = {
+		DCC1C3C22E44D98C00D6E1A9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -336,14 +347,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		DCC1C3C02E44D98C00D6E1A9 /* Sources */ = {
+		DC0743BA2E6DAE8700398A55 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DCC1C3D52E44D98E00D6E1A9 /* Sources */ = {
+		DCC1C3C02E44D98C00D6E1A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,10 +371,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DCC1C3DB2E44D98E00D6E1A9 /* PBXTargetDependency */ = {
+		DC0743C32E6DAE8700398A55 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DCC1C3C32E44D98C00D6E1A9 /* NiyasKitchenInventory */;
-			targetProxy = DCC1C3DA2E44D98E00D6E1A9 /* PBXContainerItemProxy */;
+			targetProxy = DC0743C22E6DAE8700398A55 /* PBXContainerItemProxy */;
 		};
 		DCC1C3E52E44D98E00D6E1A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -373,6 +384,40 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		DC0743C52E6DAE8700398A55 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.NiyasKitchenInventoryTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NiyasKitchenInventory.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NiyasKitchenInventory";
+			};
+			name = Debug;
+		};
+		DC0743C62E6DAE8700398A55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = test.NiyasKitchenInventoryTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NiyasKitchenInventory.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NiyasKitchenInventory";
+			};
+			name = Release;
+		};
 		DCC1C3EB2E44D98E00D6E1A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -564,50 +609,6 @@
 			};
 			name = Release;
 		};
-		DCC1C3F12E44D98E00D6E1A9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = test.NiyasKitchenInventoryTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NiyasKitchenInventory.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NiyasKitchenInventory";
-			};
-			name = Debug;
-		};
-		DCC1C3F22E44D98E00D6E1A9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = test.NiyasKitchenInventoryTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NiyasKitchenInventory.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NiyasKitchenInventory";
-			};
-			name = Release;
-		};
 		DCC1C3F42E44D98E00D6E1A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -651,6 +652,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DC0743C42E6DAE8700398A55 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventoryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC0743C52E6DAE8700398A55 /* Debug */,
+				DC0743C62E6DAE8700398A55 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DCC1C3BF2E44D98C00D6E1A9 /* Build configuration list for PBXProject "NiyasKitchenInventory" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -665,15 +675,6 @@
 			buildConfigurations = (
 				DCC1C3EE2E44D98E00D6E1A9 /* Debug */,
 				DCC1C3EF2E44D98E00D6E1A9 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		DCC1C3F02E44D98E00D6E1A9 /* Build configuration list for PBXNativeTarget "NiyasKitchenInventoryTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DCC1C3F12E44D98E00D6E1A9 /* Debug */,
-				DCC1C3F22E44D98E00D6E1A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

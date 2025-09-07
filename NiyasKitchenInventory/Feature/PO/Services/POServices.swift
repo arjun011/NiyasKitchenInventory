@@ -40,7 +40,7 @@ class POServices {
 
     }
 
-    func saveDraft(orderDraft: POModel, lines:[POLineModel]) async throws  {
+    func saveDraft(orderDraft: POModel, lines: [POLineModel]) async throws {
 
         let doc = db.collection("purchaseOrders").document()
         var draft = orderDraft
@@ -53,9 +53,7 @@ class POServices {
             "updatedAt": FieldValue.serverTimestamp(),
         ])
 
-
         try await self.replaceLines(poId: doc.documentID, lines: lines)
-
 
     }
 
@@ -77,6 +75,22 @@ class POServices {
         }
 
         try await batch.commit()
+    }
+
+}
+
+//MARK: - POView -
+extension POServices {
+
+    func fetchPurchaseOrderListOn(status: POStatus) async throws -> [POModel] {
+
+        let snap = try await db.collection("purchaseOrders").getDocuments()
+
+        let poList = try snap.documents.compactMap { doc in
+            try doc.data(as: POModel.self)
+        }
+
+        return poList
     }
 
 }

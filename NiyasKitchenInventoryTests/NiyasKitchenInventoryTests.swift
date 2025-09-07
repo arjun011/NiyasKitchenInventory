@@ -2,11 +2,10 @@
 //  NiyasKitchenInventoryTests.swift
 //  NiyasKitchenInventoryTests
 //
-//  Created by Arjun on 07/08/25.
+//  Created by Arjun on 07/09/25.
 //
 
 import Testing
-@testable import NiyasKitchenInventory
 
 struct NiyasKitchenInventoryTests {
 
@@ -15,5 +14,3 @@ struct NiyasKitchenInventoryTests {
     }
 
 }
-
-

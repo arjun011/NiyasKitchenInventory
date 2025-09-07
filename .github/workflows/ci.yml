@@ -1,83 +1,83 @@
 name: CI
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, feature/** ]
+    branches: [ main, feature, develop ]
   pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROJECT: NiyasKitchenInventory.xcodeproj
+  SCHEME: NiyasKitchenInventory
+  TEST_PLAN_NAME: NiyasKitchenInventory   # exact name from the Test Plan editor (top title)
+  CONFIGURATION: Debug
+  DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 15 Pro
+  DEVELOPER_DIR: /Applications/Xcode_16.1.app
 
 jobs:
   build-test:
-    runs-on: macos-14
+    runs-on: macos-15
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode (16.1 → 16.0 → default)
+      - name: Select Xcode 16.1 & show versions
         run: |
-          if [ -d "/Applications/Xcode_16.1.app" ]; then
-            sudo xcode-select -s "/Applications/Xcode_16.1.app"
-          elif [ -d "/Applications/Xcode_16.0.app" ]; then
-            sudo xcode-select -s "/Applications/Xcode_16.0.app"
-          else
-            sudo xcode-select -s "/Applications/Xcode.app"
-          fi
+          sudo xcode-select -s "$DEVELOPER_DIR"
+          xcodebuild -version
+          xcrun simctl list runtimes | grep iOS || true
+          xcrun simctl list devices | head -n 20
 
-      - name: Verify Xcode
-        run: xcodebuild -version
+      - name: Cache Swift Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
 
-      - name: List available simulators
-        run: xcrun simctl list devices
+      - name: Resolve SPM Dependencies
+        run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Resolve Swift Packages
-        run: xcodebuild -project NiyasKitchenInventory.xcodeproj -resolvePackageDependencies
-
-      - name: Build (Debug)
-        run: >
-          xcodebuild -project NiyasKitchenInventory.xcodeproj
-          -scheme "NiyasKitchenInventory"
-          -configuration Debug
-          -sdk iphonesimulator
-          build
-
-      # Try to run tests on iPhone 16 Pro, fall back to 15 Pro.
-      # If there are no tests yet, we do build-for-testing so CI still passes.
-      - name: Test (with fallback + result bundle)
+      - name: Build & Test (with Test Plan)
+        id: xcode-test
         run: |
-          set -e
-          OUT=TestResults.xcresult
-          # First try iPhone 16 Pro
-          if xcodebuild -project NiyasKitchenInventory.xcodeproj \
-              -scheme "NiyasKitchenInventory" \
-              -configuration Debug \
-              -sdk iphonesimulator \
-              -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
-              -resultBundlePath "$OUT" \
-              test; then
-            echo "Tests passed on iPhone 16 Pro"
-          # Fallback to iPhone 15 Pro
-          elif xcodebuild -project NiyasKitchenInventory.xcodeproj \
-              -scheme "NiyasKitchenInventory" \
-              -configuration Debug \
-              -sdk iphonesimulator \
-              -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
-              -resultBundlePath "$OUT" \
-              test; then
-            echo "Tests passed on iPhone 15 Pro"
-          else
-            echo "xcodebuild test failed. If you have no tests yet, doing build-for-testing so CI can pass."
-            # Last resort while you have 0 tests: just build the test bundles
-            xcodebuild -project NiyasKitchenInventory.xcodeproj \
-              -scheme "NiyasKitchenInventory" \
-              -configuration Debug \
-              -sdk iphonesimulator \
-              -resultBundlePath "$OUT" \
-              build-for-testing
-          fi
+          set -euo pipefail
+          xcodebuild \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -testPlan "$TEST_PLAN_NAME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination "$DESTINATION" \
+            -enableCodeCoverage YES \
+            clean test \
+          | xcpretty && exit ${PIPESTATUS[0]}
 
-      - name: Upload test result bundle
+      - name: Locate latest .xcresult
         if: always()
+        id: find-xcresult
+        run: |
+          set -euo pipefail
+          RESULT=$(ls -dt ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult 2>/dev/null | head -n 1 || true)
+          echo "result_path=${RESULT}" >> $GITHUB_OUTPUT
+
+      - name: Upload TestResult.xcresult
+        if: always() && steps.find-xcresult.outputs.result_path != ''
         uses: actions/upload-artifact@v4
         with:
-          name: xcresult
-          path: TestResults.xcresult
+          name: TestResult.xcresult
+          path: ${{ steps.find-xcresult.outputs.result_path }}
+          if-no-files-found: ignore
+
+      - name: Helpful failure message
+        if: failure()
+        run: |
+          echo "xcodebuild failed. Download TestResult.xcresult artifact and open it in Xcode for details."
+          exit 1
