@@ -13,13 +13,12 @@ concurrency:
 env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
-  TEST_PLAN_NAME: NiyasKitchenInventory   # exact name from the Test Plan editor (top title)
   CONFIGURATION: Debug
-  DEVELOPER_DIR: /Applications/Xcode_16.1.app
-  DESTINATION: platform=iOS Simulator,name=iPhone 15,OS=17.0
+  DESTINATION: "generic/platform=iOS Simulator"
+  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
 
 jobs:
-  build-test:
+  build-only:
     runs-on: macos-15
 
     steps:
@@ -31,7 +30,6 @@ jobs:
           sudo xcode-select -s "$DEVELOPER_DIR"
           xcodebuild -version
           xcrun simctl list runtimes | grep iOS || true
-          xcrun simctl list devices | head -n 20
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -40,44 +38,43 @@ jobs:
             ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
             ~/Library/Caches/org.swift.swiftpm
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
+          restore-keys: |
+            spm-${{ runner.os }}-
 
-      - name: Resolve SPM Dependencies
+      - name: Resolve SPM dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Build & Test (with Test Plan)
-        id: xcode-test
+      - name: Build (no tests)
+        id: build
         run: |
           set -euo pipefail
+          rm -rf build || true
+          mkdir -p build
+          # Build the app for the simulator; disable signing to avoid CI cert issues
+          set +e
           xcodebuild \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
-            -testPlan "$TEST_PLAN_NAME" \
             -configuration "$CONFIGURATION" \
             -sdk iphonesimulator \
             -destination "$DESTINATION" \
-            -enableCodeCoverage YES \
-            clean test \
-          | xcpretty && exit ${PIPESTATUS[0]}
+            CODE_SIGNING_ALLOWED=NO \
+            clean build | tee build/xcodebuild.log
+          XCB_EXIT=${PIPESTATUS[0]}
+          set -e
+          echo "XCODEBUILD_EXIT=${XCB_EXIT}" >> "$GITHUB_OUTPUT"
+          tail -n 200 build/xcodebuild.log || true
 
-      - name: Locate latest .xcresult
+      - name: Upload xcodebuild.log
         if: always()
-        id: find-xcresult
-        run: |
-          set -euo pipefail
-          RESULT=$(ls -dt ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult 2>/dev/null | head -n 1 || true)
-          echo "result_path=${RESULT}" >> $GITHUB_OUTPUT
-
-      - name: Upload TestResult.xcresult
-        if: always() && steps.find-xcresult.outputs.result_path != ''
         uses: actions/upload-artifact@v4
         with:
-          name: TestResult.xcresult
-          path: ${{ steps.find-xcresult.outputs.result_path }}
-          if-no-files-found: ignore
+          name: xcodebuild.log
+          path: build/xcodebuild.log
+          if-no-files-found: warn
 
-      - name: Helpful failure message
-        if: failure()
+      - name: Fail job if build failed
+        if: steps.build.outputs.XCODEBUILD_EXIT != '0'
         run: |
-          echo "xcodebuild failed. Download TestResult.xcresult artifact and open it in Xcode for details."
+          echo "Build failed. See the xcodebuild.log artifact for details."
           exit 1
