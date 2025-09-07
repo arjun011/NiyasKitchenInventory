@@ -10,16 +10,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  build-only:
-    runs-on: macos-15
+env:
+  PROJECT: NiyasKitchenInventory.xcodeproj
+  SCHEME: NiyasKitchenInventory
+  CONFIGURATION: Debug
+  # Use an iOS version that exists on GitHub macOS images
+  DESTINATION: platform=iOS Simulator,OS=17.5,name=iPhone 14
+  DEVELOPER_DIR: /Applications/Xcode_16.1.app
 
-    env:
-      PROJECT: "NiyasKitchenInventory.xcodeproj"
-      SCHEME: "NiyasKitchenInventory"
-      CONFIGURATION: "Debug"
-      DESTINATION: "generic/platform=iOS Simulator"
-      DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
+jobs:
+  build:
+    runs-on: macos-15
 
     steps:
       - name: Checkout
@@ -30,6 +31,7 @@ jobs:
           sudo xcode-select -s "$DEVELOPER_DIR"
           xcodebuild -version
           xcrun simctl list runtimes | grep iOS || true
+          xcrun simctl list devices | head -n 20
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -38,21 +40,14 @@ jobs:
             ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
             ~/Library/Caches/org.swift.swiftpm
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
+          restore-keys: spm-${{ runner.os }}-
 
       - name: Resolve SPM dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Build (no tests) — capture full log and xcresult
-        id: build
+      - name: Build (no code signing)
         run: |
           set -euo pipefail
-          rm -rf build || true
-          mkdir -p build
-
-          # Run build and capture raw output + exit code
-          set +e
           xcodebuild \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
@@ -61,34 +56,42 @@ jobs:
             -destination "$DESTINATION" \
             CODE_SIGNING_ALLOWED=NO \
             -resultBundlePath build/CI.xcresult \
-            clean build | tee build/xcodebuild.log
-          XCB_EXIT=${PIPESTATUS[0]}
-          set -e
+            clean build \
+          | xcpretty && exit ${PIPESTATUS[0]}
 
-          echo "XCODEBUILD_EXIT=${XCB_EXIT}" >> "$GITHUB_OUTPUT"
-          echo "---- Tail of xcodebuild.log ----"
-          tail -n 300 build/xcodebuild.log || true
-          echo "--------------------------------"
+      # --- Uncomment this block when you add tests ---
+      # - name: Test
+      #   run: |
+      #     set -euo pipefail
+      #     xcodebuild \
+      #       -project "$PROJECT" \
+      #       -scheme "$SCHEME" \
+      #       -configuration "$CONFIGURATION" \
+      #       -sdk iphonesimulator \
+      #       -destination "$DESTINATION" \
+      #       CODE_SIGNING_ALLOWED=NO \
+      #       -enableCodeCoverage YES \
+      #       -resultBundlePath build/CI.xcresult \
+      #       test \
+      #     | xcpretty && exit ${PIPESTATUS[0]}
 
-      - name: Upload xcodebuild.log
+      - name: Upload xcresult
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: xcodebuild.log
-          path: build/xcodebuild.log
-          if-no-files-found: warn
-
-      - name: Upload BuildResult.xcresult (if produced)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: BuildResult.xcresult
+          name: CI.xcresult
           path: build/CI.xcresult
           if-no-files-found: warn
 
-      - name: Fail job if build failed
-        if: steps.build.outputs.XCODEBUILD_EXIT != '0'
+      - name: Upload raw build log
+        if: always()
         run: |
-          echo "Build failed. Download artifacts: xcodebuild.log and BuildResult.xcresult, then open the xcresult in Xcode."
-          exit 1
-
+          mkdir -p build/logs
+          echo "See CI.xcresult for full details." > build/logs/README.txt
+        shell: bash
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logs
+          path: build/logs
+          if-no-files-found: warn

@@ -47,27 +47,12 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		DC0743BF2E6DAE8700398A55 /* NiyasKitchenInventoryTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = NiyasKitchenInventoryTests;
-			sourceTree = "<group>";
-		};
 		DCC1C3C62E44D98C00D6E1A9 /* NiyasKitchenInventory */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */,
 			);
 			path = NiyasKitchenInventory;
-			sourceTree = "<group>";
-		};
-		DCC1C3DC2E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = NiyasKitchenInventoryTests;
-			sourceTree = "<group>";
-		};
-		DCC1C3E62E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = NiyasKitchenInventoryUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -110,9 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				DCC1C3C62E44D98C00D6E1A9 /* NiyasKitchenInventory */,
-				DCC1C3DC2E44D98E00D6E1A9 /* NiyasKitchenInventoryTests */,
-				DCC1C3E62E44D98E00D6E1A9 /* NiyasKitchenInventoryUITests */,
-				DC0743BF2E6DAE8700398A55 /* NiyasKitchenInventoryTests */,
 				DCC1C3C52E44D98C00D6E1A9 /* Products */,
 			);
 			sourceTree = "<group>";
