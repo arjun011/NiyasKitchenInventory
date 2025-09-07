@@ -10,16 +10,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PROJECT: NiyasKitchenInventory.xcodeproj
-  SCHEME: NiyasKitchenInventory
-  CONFIGURATION: Debug
-  DESTINATION: "generic/platform=iOS Simulator"
-  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
-
 jobs:
   build-only:
     runs-on: macos-15
+
+    env:
+      PROJECT: "NiyasKitchenInventory.xcodeproj"
+      SCHEME: "NiyasKitchenInventory"
+      CONFIGURATION: "Debug"
+      DESTINATION: "generic/platform=iOS Simulator"
+      DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
 
     steps:
       - name: Checkout
@@ -44,13 +44,14 @@ jobs:
       - name: Resolve SPM dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Build (no tests)
+      - name: Build (no tests) — capture full log and xcresult
         id: build
         run: |
           set -euo pipefail
           rm -rf build || true
           mkdir -p build
-          # Build the app for the simulator; disable signing to avoid CI cert issues
+
+          # Run build and capture raw output + exit code
           set +e
           xcodebuild \
             -project "$PROJECT" \
@@ -59,11 +60,15 @@ jobs:
             -sdk iphonesimulator \
             -destination "$DESTINATION" \
             CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath build/CI.xcresult \
             clean build | tee build/xcodebuild.log
           XCB_EXIT=${PIPESTATUS[0]}
           set -e
+
           echo "XCODEBUILD_EXIT=${XCB_EXIT}" >> "$GITHUB_OUTPUT"
-          tail -n 200 build/xcodebuild.log || true
+          echo "---- Tail of xcodebuild.log ----"
+          tail -n 300 build/xcodebuild.log || true
+          echo "--------------------------------"
 
       - name: Upload xcodebuild.log
         if: always()
@@ -73,8 +78,17 @@ jobs:
           path: build/xcodebuild.log
           if-no-files-found: warn
 
+      - name: Upload BuildResult.xcresult (if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BuildResult.xcresult
+          path: build/CI.xcresult
+          if-no-files-found: warn
+
       - name: Fail job if build failed
         if: steps.build.outputs.XCODEBUILD_EXIT != '0'
         run: |
-          echo "Build failed. See the xcodebuild.log artifact for details."
+          echo "Build failed. Download artifacts: xcodebuild.log and BuildResult.xcresult, then open the xcresult in Xcode."
           exit 1
+
