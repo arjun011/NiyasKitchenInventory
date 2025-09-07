@@ -19,7 +19,7 @@ Pods/
 Icon
 
 # Google Plist
-GoogleService-Info.plist
+#GoogleService-Info.plist
 # Thumbnails
 ._*
 
