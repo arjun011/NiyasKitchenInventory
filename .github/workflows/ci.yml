@@ -14,12 +14,11 @@ env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
   CONFIGURATION: Debug
-  # Use an iOS version that exists on GitHub macOS images
-  DESTINATION: platform=iOS Simulator,OS=17.5,name=iPhone 14
+  DESTINATION: platform=iOS Simulator,OS=17.4,name=iPhone 15
   DEVELOPER_DIR: /Applications/Xcode_16.1.app
 
 jobs:
-  build:
+  build-test:
     runs-on: macos-15
 
     steps:
@@ -42,10 +41,11 @@ jobs:
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
-      - name: Resolve SPM dependencies
+      - name: Resolve SPM Dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      - name: Build (no code signing)
+      - name: Build & Test
+        id: xcode-test
         run: |
           set -euo pipefail
           xcodebuild \
@@ -54,44 +54,28 @@ jobs:
             -configuration "$CONFIGURATION" \
             -sdk iphonesimulator \
             -destination "$DESTINATION" \
-            CODE_SIGNING_ALLOWED=NO \
-            -resultBundlePath build/CI.xcresult \
+            -enableCodeCoverage YES \
             clean build \
           | xcpretty && exit ${PIPESTATUS[0]}
 
-      # --- Uncomment this block when you add tests ---
-      # - name: Test
-      #   run: |
-      #     set -euo pipefail
-      #     xcodebuild \
-      #       -project "$PROJECT" \
-      #       -scheme "$SCHEME" \
-      #       -configuration "$CONFIGURATION" \
-      #       -sdk iphonesimulator \
-      #       -destination "$DESTINATION" \
-      #       CODE_SIGNING_ALLOWED=NO \
-      #       -enableCodeCoverage YES \
-      #       -resultBundlePath build/CI.xcresult \
-      #       test \
-      #     | xcpretty && exit ${PIPESTATUS[0]}
-
-      - name: Upload xcresult
+      - name: Locate latest .xcresult
         if: always()
+        id: find-xcresult
+        run: |
+          set -euo pipefail
+          RESULT=$(ls -dt ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult 2>/dev/null | head -n 1 || true)
+          echo "result_path=${RESULT}" >> $GITHUB_OUTPUT
+
+      - name: Upload TestResult.xcresult
+        if: always() && steps.find-xcresult.outputs.result_path != ''
         uses: actions/upload-artifact@v4
         with:
-          name: CI.xcresult
-          path: build/CI.xcresult
-          if-no-files-found: warn
+          name: TestResult.xcresult
+          path: ${{ steps.find-xcresult.outputs.result_path }}
+          if-no-files-found: ignore
 
-      - name: Upload raw build log
-        if: always()
+      - name: Helpful failure message
+        if: failure()
         run: |
-          mkdir -p build/logs
-          echo "See CI.xcresult for full details." > build/logs/README.txt
-        shell: bash
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: logs
-          path: build/logs
-          if-no-files-found: warn
+          echo "xcodebuild failed. Download TestResult.xcresult artifact and open it in Xcode for details."
+          exit 1
