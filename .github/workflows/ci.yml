@@ -13,10 +13,10 @@ concurrency:
 env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
-  TEST_PLAN_NAME: NiyasKitchenInventory
+  TEST_PLAN_NAME: NiyasKitchenInventory   # exact name from the Test Plan editor (top title)
   CONFIGURATION: Debug
   DEVELOPER_DIR: /Applications/Xcode_16.1.app
-  DESTINATION: platform=iOS Simulator,name=iPhone 15,OS=latest
+  DESTINATION: platform=iOS Simulator,name=iPhone 15,OS=17.0
 
 jobs:
   build-test:
