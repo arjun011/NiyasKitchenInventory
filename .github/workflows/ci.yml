@@ -13,46 +13,83 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Show which Xcodes are installed on the runner
       - name: List installed Xcodes
         run: ls -1 /Applications | grep -E '^Xcode(_[0-9]+\.[0-9]+)?\.app$' || true
 
-      # Select the newest available Xcode (16.1 preferred, else 16.0, else default)
-      - name: Select Xcode
+      - name: Select Xcode (16.1 → 16.0 → default)
         run: |
           if [ -d "/Applications/Xcode_16.1.app" ]; then
             sudo xcode-select -s "/Applications/Xcode_16.1.app"
           elif [ -d "/Applications/Xcode_16.0.app" ]; then
             sudo xcode-select -s "/Applications/Xcode_16.0.app"
           else
-            # Fallback to the default Xcode on the image
             sudo xcode-select -s "/Applications/Xcode.app"
           fi
-
-      - name: Verify Xcode version
+      - name: Verify Xcode
         run: xcodebuild -version
 
-      - name: Cache Swift Packages
-        uses: actions/cache@v4
-        with:
-          path: ~/Library/Developer/Xcode/DerivedData
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: ${{ runner.os }}-spm-
+      - name: Show repo files
+        run: |
+          pwd
+          ls -la
+          ls -la *.xcodeproj || true
+          ls -la *.xcworkspace || true
+
+      - name: List schemes
+        run: |
+          echo "== xcodebuild -list =="
+          xcodebuild -list || true
+          echo "== xcodebuild -list (project) =="
+          for P in *.xcodeproj; do
+            echo "-> $P"
+            xcodebuild -project "$P" -list || true
+          done
+          echo "== xcodebuild -list (workspace) =="
+          for W in *.xcworkspace; do
+            echo "-> $W"
+            xcodebuild -workspace "$W" -list || true
+          done
+
+      - name: List available simulators
+        run: xcrun simctl list devices
 
       - name: Resolve Swift Packages
         run: xcodebuild -resolvePackageDependencies
 
-      - name: Build
-        run: >
-          xcodebuild -scheme "NiyasKitchenInventory"
-          -sdk iphonesimulator
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
-          -configuration Debug
-          build
+      - name: Build & Test (auto-detect workspace/project)
+        run: |
+          set -euo pipefail
 
-      - name: Test
-        run: >
-          xcodebuild -scheme "NiyasKitchenInventory"
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
-          -configuration Debug
-          test
+          SCHEME="NiyasKitchenInventory"   # <-- make sure this matches EXACT shared scheme
+          DEST="platform=iOS Simulator,name=iPhone 16 Pro"  # fallback below if missing
+
+          # Pick workspace if present, else project
+          if compgen -G "*.xcworkspace" > /dev/null; then
+            FILE=$(ls -1 *.xcworkspace | head -n1)
+            ARG=(-workspace "$FILE")
+          else
+            FILE=$(ls -1 *.xcodeproj | head -n1)
+            ARG=(-project "$FILE")
+          fi
+
+          echo "Using file: $FILE"
+          echo "Trying destination: $DEST"
+
+          # Try build; if destination not found, retry with iPhone 15 Pro
+          set +e
+          xcodebuild "${ARG[@]}" -scheme "$SCHEME" -sdk iphonesimulator -destination "$DEST" -configuration Debug build | tee build.log
+          STATUS=$?
+          set -e
+
+          if grep -q "Unable to find a destination matching the provided destination specifier" build.log; then
+            echo "Retrying with iPhone 15 Pro…"
+            DEST2="platform=iOS Simulator,name=iPhone 15 Pro"
+            xcodebuild "${ARG[@]}" -scheme "$SCHEME" -sdk iphonesimulator -destination "$DEST2" -configuration Debug build
+          elif [ $STATUS -ne 0 ]; then
+            echo "Build failed with status $STATUS"
+            exit $STATUS
+          fi
+
+          # Run tests on same destination (best-effort)
+          xcodebuild "${ARG[@]}" -scheme "$SCHEME" -sdk iphonesimulator -destination "$DEST" -configuration Debug test || \
+          xcodebuild "${ARG[@]}" -scheme "$SCHEME" -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 15 Pro" -configuration Debug test
