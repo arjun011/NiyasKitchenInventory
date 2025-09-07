@@ -13,9 +13,10 @@ concurrency:
 env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
-  TEST_PLAN_NAME: NiyasKitchenInventory   # exact name from the Test Plan editor (top title)
+  TEST_PLAN_NAME: NiyasKitchenInventory
   CONFIGURATION: Debug
   DEVELOPER_DIR: /Applications/Xcode_16.1.app
+  DESTINATION: platform=iOS Simulator,name=iPhone 15,OS=latest
 
 jobs:
   build-test:
@@ -31,16 +32,6 @@ jobs:
           xcodebuild -version
           xcrun simctl list runtimes | grep iOS || true
           xcrun simctl list devices | head -n 20
-
-      - name: Set Simulator Destination Dynamically
-        id: find-sim
-        run: |
-          # Find an available iOS simulator (e.g., iPhone 15, latest OS)
-          DEVICE_NAME=$(xcrun simctl list devices | grep -E 'iPhone 1[5-9]' | grep -v unavailable | head -n1 | awk -F'[()]' '{print $2}')
-          OS_VERSION=$(xcrun simctl list runtimes | grep -E 'iOS [0-9]+' | grep -v unavailable | tail -1 | awk '{print $2}')
-          echo "DEVICE_NAME=${DEVICE_NAME:-iPhone 15}" >> $GITHUB_ENV
-          echo "OS_VERSION=${OS_VERSION:-latest}" >> $GITHUB_ENV
-          echo "DESTINATION=platform=iOS Simulator,name=${DEVICE_NAME:-iPhone 15},OS=${OS_VERSION:-latest}" >> $GITHUB_ENV
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
