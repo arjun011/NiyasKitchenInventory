@@ -25,7 +25,7 @@ struct DashboardView: View {
                 
                 KIPStatCardView(title: "Waste This Week", value: vm.wasteLastSevenDayCount, icon: "trash.fill", bgColor: Color.appDanger)
                 
-                VStack(alignment: .leading, content: {  
+                VStack(alignment: .leading, content: {
                    
                     Text("Quick Actions")
                         .font(.title3.weight(.semibold))
