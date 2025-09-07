@@ -13,10 +13,10 @@ concurrency:
 env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
-  TEST_PLAN_NAME: NiyasKitchenInventory   # must match the name shown in Xcode
+  TEST_PLAN_NAME: NiyasKitchenInventory
   CONFIGURATION: Debug
-  DESTINATION: platform=iOS Simulator,OS=latest,name=iPhone 15 Pro
-  DEVELOPER_DIR: /Applications/Xcode_16.1.app
+  DESTINATION: "platform=iOS Simulator,OS=latest,name=iPhone 15 Pro"
+  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
 
 jobs:
   build-test:
@@ -42,9 +42,8 @@ jobs:
           ls -la
           echo "== Xcode schemes =="
           xcodebuild -list -project "$PROJECT" || true
-          echo "== Test plan file exists? =="
-          # show any .xctestplan files present
-          find . -name "*.xctestplan" -maxdepth 2 -print || true
+          echo "== Test plan files =="
+          find . -name "*.xctestplan" -maxdepth 3 -print || true
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -53,12 +52,12 @@ jobs:
             ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
             ~/Library/Caches/org.swift.swiftpm
           key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
+          restore-keys: |
+            spm-${{ runner.os }}-
 
       - name: Resolve SPM Dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      # Build & Test with robust logging and a fixed result bundle path
       - name: Build & Test
         id: xcode-test
         run: |
@@ -81,15 +80,10 @@ jobs:
           XCB_EXIT=${PIPESTATUS[0]}
           set -e
 
-          echo "XCODEBUILD_EXIT=${XCB_EXIT}" >> $GITHUB_OUTPUT
+          echo "XCODEBUILD_EXIT=${XCB_EXIT}" >> "$GITHUB_OUTPUT"
           echo "---- Tail of xcodebuild.log ----"
           tail -n 300 xcodebuild.log || true
           echo "--------------------------------"
-
-          # If build/test failed, still continue so we can upload artifacts
-          if [ $XCB_EXIT -ne 0 ]; then
-            echo "xcodebuild failed with exit $XCB_EXIT"
-          fi
 
       - name: Upload raw xcodebuild log
         if: always()
