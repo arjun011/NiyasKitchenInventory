@@ -2,22 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop, feature ]
+    branches: [ main, feature, develop ]
   pull_request:
-    branches: [ main, develop, feature ]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [ main, feature, develop ]
 
 env:
-  # === Tweak these to your repo ===
-  SCHEME: NiyasKitchenInventory         # make sure this scheme is Shared in Xcode
+  PROJECT: NiyasKitchenInventory.xcodeproj        # If you use a workspace, set WORKSPACE and remove PROJECT
+  SCHEME: NiyasKitchenInventory
   CONFIGURATION: Debug
-  XCODE_VERSION: 16.1                   # runner has /Applications/Xcode_16.1.app
-  PREFERRED_RUNTIME: "iOS 17.4"         # we’ll fall back if missing
-  PREFERRED_DEVICE: "iPhone 15"
-  ENABLE_TESTS: "false"                 # set to "true" when you add tests
+  DESTINATION: platform=iOS Simulator,name=iPhone 16 Pro
+  XCODE_APP: /Applications/Xcode_16.1.app
 
 jobs:
   build:
@@ -27,125 +21,78 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode and show versions
+      - name: Select Xcode
         run: |
-          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
+          sudo xcode-select -s "$XCODE_APP"
           xcodebuild -version
-          echo "Available iOS runtimes:"
-          xcrun simctl list runtimes | grep iOS || true
-          echo "Some devices:"
-          xcrun simctl list devices | head -n 30 || true
+          xcrun simctl list runtimes | grep "iOS " || true
+          xcrun simctl list devices | head -n 25
 
-      - name: Detect project/workspace & list schemes
-        id: probe
-        shell: bash
+      # 🔎 Sanity checks (these often reveal exit 66 root causes)
+      - name: List Xcode projects & workspaces at repo root
+        run: ls -la
+
+      - name: Show schemes (must include your scheme and be Shared)
         run: |
-          set -euo pipefail
-
-          # Prefer workspace if present
-          WS=$(ls -1 *.xcworkspace 2>/dev/null | head -n1 || true)
-          PRJ=$(ls -1 *.xcodeproj 2>/dev/null | head -n1 || true)
-
-          if [[ -n "$WS" ]]; then
-            echo "projflag=-workspace \"$WS\"" >> $GITHUB_OUTPUT
-          elif [[ -n "$PRJ" ]]; then
-            echo "projflag=-project \"$PRJ\"" >> $GITHUB_OUTPUT
+          if [ -f "$PROJECT" ]; then
+            xcodebuild -list -project "$PROJECT"
+          elif [ -f "$WORKSPACE" ]; then
+            xcodebuild -list -workspace "$WORKSPACE"
           else
-            echo "❌ No .xcworkspace or .xcodeproj found at repo root"; exit 1
+            echo "❌ Neither PROJECT nor WORKSPACE file found at repo root"; exit 66
           fi
 
-          echo "::group::xcodebuild -list"
-          xcodebuild $([[ -n "$WS" ]] && echo "-workspace \"$WS\"" || echo "-project \"$PRJ\"") -list || true
-          echo "::endgroup::"
-
-      - name: Pick a valid Simulator destination (auto-fallback)
-        id: dest
-        shell: bash
+      - name: Show valid destinations for the scheme
         run: |
-          set -euo pipefail
-          WANT="platform=iOS Simulator,OS=${PREFERRED_RUNTIME#iOS },name=${PREFERRED_DEVICE}"
-          echo "Trying preferred destination: $WANT"
-
-          # Check if preferred destination exists
-          if xcrun simctl list devices | grep -q "${PREFERRED_DEVICE} .* (${PREFERRED_RUNTIME});"; then
-            DEST="$WANT"
+          if [ -f "$PROJECT" ]; then
+            xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showdestinations
           else
-            echo "Preferred destination not found. Falling back to first available iPhone simulator…"
-            # Find first available iPhone simulator line like: iPhone 15 (XXXX) (Booted/Shutdown) (iOS 17.4)
-            LINE=$(xcrun simctl list devices available | grep -m1 -E "iPhone [0-9A-Za-z+ ]+ \(" || true)
-            if [[ -z "$LINE" ]]; then
-              echo "❌ No available iPhone Simulator found on runner."; exit 70
-            fi
-            # Extract name and runtime
-            NAME=$(echo "$LINE" | sed -E 's/^ *([^()]+) \(.+$/\1/')
-            RUNTIME=$(echo "$LINE" | sed -nE 's/.*\(iOS ([0-9.]+)\).*/\1/p')
-            DEST="platform=iOS Simulator,OS=$RUNTIME,name=$NAME"
+            xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -showdestinations
           fi
 
-          echo "destination=$DEST" >> $GITHUB_OUTPUT
-          echo "Using destination: $DEST"
-
-      - name: Cache Swift Packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
-            ~/Library/Caches/org.swift.swiftpm
-          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
-
-      - name: Resolve SPM Dependencies
-        run: |
-          xcodebuild ${{ steps.probe.outputs.projflag }} -resolvePackageDependencies
-
+      # 🧱 Build with explicit output locations so we can always upload artifacts
       - name: Build (no signing)
         id: build
-        shell: bash
         run: |
-          set -o pipefail
-          XCRESULT="$PWD/BuildResult.xcresult"
-          xcodebuild \
-            ${{ steps.probe.outputs.projflag }} \
-            -scheme "$SCHEME" \
-            -configuration "$CONFIGURATION" \
-            -sdk iphonesimulator \
-            -destination "${{ steps.dest.outputs.destination }}" \
-            CODE_SIGNING_ALLOWED=NO \
-            clean build \
-            -resultBundlePath "$XCRESULT" \
-            | tee "$PWD/build.log"
-          echo "build_log=$PWD/build.log" >> $GITHUB_OUTPUT
-          if [ -d "$XCRESULT" ]; then echo "xcresult=$XCRESULT" >> $GITHUB_OUTPUT; fi
+          set -euo pipefail
+          mkdir -p build
+          if [ -f "$PROJECT" ]; then
+            xcodebuild \
+              -project "$PROJECT" \
+              -scheme "$SCHEME" \
+              -configuration "$CONFIGURATION" \
+              -sdk iphonesimulator \
+              -destination "$DESTINATION" \
+              -derivedDataPath build/DerivedData \
+              -resultBundlePath build/BuildResult.xcresult \
+              CODE_SIGNING_ALLOWED=NO \
+              clean build \
+            | tee build/xcodebuild.log
+          else
+            xcodebuild \
+              -workspace "$WORKSPACE" \
+              -scheme "$SCHEME" \
+              -configuration "$CONFIGURATION" \
+              -sdk iphonesimulator \
+              -destination "$DESTINATION" \
+              -derivedDataPath build/DerivedData \
+              -resultBundlePath build/BuildResult.xcresult \
+              CODE_SIGNING_ALLOWED=NO \
+              clean build \
+            | tee build/xcodebuild.log
+          fi
 
-      - name: (Optional) Test with a dummy target
-        if: env.ENABLE_TESTS == 'true'
-        id: test
-        shell: bash
-        run: |
-          set -o pipefail
-          XCRESULT="$PWD/TestResult.xcresult"
-          xcodebuild \
-            ${{ steps.probe.outputs.projflag }} \
-            -scheme "$SCHEME" \
-            -configuration "$CONFIGURATION" \
-            -sdk iphonesimulator \
-            -destination "${{ steps.dest.outputs.destination }}" \
-            -enableCodeCoverage YES \
-            test \
-            -resultBundlePath "$XCRESULT" \
-            | tee "$PWD/test.log"
-          echo "test_log=$PWD/test.log" >> $GITHUB_OUTPUT
-          if [ -d "$XCRESULT" ]; then echo "test_xcresult=$XCRESULT" >> $GITHUB_OUTPUT; fi
-
-      - name: Upload artifacts
+      # 📦 Always upload logs/results so you can inspect failures
+      - name: Upload result bundle
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ci-artifacts
-          path: |
-            ${{ steps.build.outputs.build_log }}
-            ${{ steps.build.outputs.xcresult }}
-            ${{ steps.test.outputs.test_log }}
-            ${{ steps.test.outputs.test_xcresult }}
-            ~/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
-          if-no-files-found: warn
+          name: BuildResult.xcresult
+          path: build/BuildResult.xcresult
+
+      - name: Upload raw xcodebuild log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild.log
+          path: build/xcodebuild.log
