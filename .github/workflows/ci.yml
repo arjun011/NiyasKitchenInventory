@@ -14,8 +14,8 @@ env:
   PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
   CONFIGURATION: Debug
-  DESTINATION: "platform=iOS Simulator,OS=17.4,name=iPhone 15"   # ← quoted
-  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"                  # ← quoted
+  DESTINATION: "platform=iOS Simulator,OS=17.4,name=iPhone 15"
+  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"
 
 jobs:
   build-test:
@@ -38,10 +38,9 @@ jobs:
           echo "::group::xcodebuild -list"
           xcodebuild -list -project "$PROJECT" || true
           echo "::endgroup::"
-
-      - name: Show valid destinations for scheme
-        run: |
+          echo "::group::Show destinations"
           xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showdestinations || true
+          echo "::endgroup::"
 
       - name: Cache Swift Packages
         uses: actions/cache@v4
@@ -55,14 +54,19 @@ jobs:
       - name: Resolve SPM Dependencies
         run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
 
-      # Build only (no tests yet) and ALWAYS emit artifacts
-      - name: Build
+      - name: Build (always produce logs)
         id: build
         shell: bash
         run: |
           set -o pipefail
           mkdir -p build
+          DERIVED="$PWD/build/DerivedData"
           XCRESULT="$PWD/build/BuildResult.xcresult"
+
+          echo "DerivedData path: $DERIVED"
+          echo "Result bundle:   $XCRESULT"
+
+          # Build. We force no signing and a deterministic derived data path.
           xcodebuild \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
@@ -70,14 +74,17 @@ jobs:
             -sdk iphonesimulator \
             -destination "$DESTINATION" \
             CODE_SIGNING_ALLOWED=NO \
-            -derivedDataPath "$PWD/build/DerivedData" \
+            -derivedDataPath "$DERIVED" \
             -resultBundlePath "$XCRESULT" \
-            clean build | tee "$PWD/build/xcodebuild.log"
+            clean build | tee "build/xcodebuild.log"
+
           STATUS=${PIPESTATUS[0]}
           echo "build_log_path=$PWD/build/xcodebuild.log" >> "$GITHUB_OUTPUT"
-          if [ -d "$XCRESULT" ]; then
-            echo "xcresult_path=$XCRESULT" >> "$GITHUB_OUTPUT"
-          fi
+          [ -d "$XCRESULT" ] && echo "xcresult_path=$XCRESULT" >> "$GITHUB_OUTPUT"
+          # Show last 100 lines in the job output for quick triage
+          echo "::group::tail build log"
+          tail -n 100 build/xcodebuild.log || true
+          echo "::endgroup::"
           exit $STATUS
 
       - name: Upload artifacts (logs & xcresult)
@@ -89,4 +96,5 @@ jobs:
             ${{ steps.build.outputs.build_log_path }}
             ${{ steps.build.outputs.xcresult_path }}
             build/DerivedData/Logs/Build/*.xcactivitylog
+            ~/Library/Developer/Xcode/DerivedData/**/Logs/Build/*.xcactivitylog
           if-no-files-found: warn
