@@ -6,93 +6,87 @@ on:
   pull_request:
     branches: [ main, feature, develop ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  PROJECT: NiyasKitchenInventory.xcodeproj        # If you use a workspace, set WORKSPACE and remove PROJECT
+  PROJECT: NiyasKitchenInventory.xcodeproj
   SCHEME: NiyasKitchenInventory
   CONFIGURATION: Debug
-  DESTINATION: platform=iOS Simulator,name=iPhone 16 Pro
-  XCODE_APP: /Applications/Xcode_16.1.app
+  DESTINATION: "platform=iOS Simulator,OS=17.4,name=iPhone 15"   # ← quoted
+  DEVELOPER_DIR: "/Applications/Xcode_16.1.app"                  # ← quoted
 
 jobs:
-  build:
+  build-test:
     runs-on: macos-15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode 16.1 & show versions
         run: |
-          sudo xcode-select -s "$XCODE_APP"
+          sudo xcode-select -s "$DEVELOPER_DIR"
           xcodebuild -version
-          xcrun simctl list runtimes | grep "iOS " || true
-          xcrun simctl list devices | head -n 25
+          xcrun simctl list runtimes | grep "iOS 17.4" || true
+          xcrun simctl list devices | grep "iPhone 15" || true
 
-      # 🔎 Sanity checks (these often reveal exit 66 root causes)
-      - name: List Xcode projects & workspaces at repo root
-        run: ls -la
-
-      - name: Show schemes (must include your scheme and be Shared)
+      - name: List repo files & schemes
         run: |
-          if [ -f "$PROJECT" ]; then
-            xcodebuild -list -project "$PROJECT"
-          elif [ -f "$WORKSPACE" ]; then
-            xcodebuild -list -workspace "$WORKSPACE"
-          else
-            echo "❌ Neither PROJECT nor WORKSPACE file found at repo root"; exit 66
-          fi
+          pwd && ls -la
+          echo "::group::xcodebuild -list"
+          xcodebuild -list -project "$PROJECT" || true
+          echo "::endgroup::"
 
-      - name: Show valid destinations for the scheme
+      - name: Show valid destinations for scheme
         run: |
-          if [ -f "$PROJECT" ]; then
-            xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showdestinations
-          else
-            xcodebuild -workspace "$WORKSPACE" -scheme "$SCHEME" -showdestinations
-          fi
+          xcodebuild -project "$PROJECT" -scheme "$SCHEME" -showdestinations || true
 
-      # 🧱 Build with explicit output locations so we can always upload artifacts
-      - name: Build (no signing)
+      - name: Cache Swift Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Resolve SPM Dependencies
+        run: xcodebuild -resolvePackageDependencies -project "$PROJECT"
+
+      # Build only (no tests yet) and ALWAYS emit artifacts
+      - name: Build
         id: build
+        shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
           mkdir -p build
-          if [ -f "$PROJECT" ]; then
-            xcodebuild \
-              -project "$PROJECT" \
-              -scheme "$SCHEME" \
-              -configuration "$CONFIGURATION" \
-              -sdk iphonesimulator \
-              -destination "$DESTINATION" \
-              -derivedDataPath build/DerivedData \
-              -resultBundlePath build/BuildResult.xcresult \
-              CODE_SIGNING_ALLOWED=NO \
-              clean build \
-            | tee build/xcodebuild.log
-          else
-            xcodebuild \
-              -workspace "$WORKSPACE" \
-              -scheme "$SCHEME" \
-              -configuration "$CONFIGURATION" \
-              -sdk iphonesimulator \
-              -destination "$DESTINATION" \
-              -derivedDataPath build/DerivedData \
-              -resultBundlePath build/BuildResult.xcresult \
-              CODE_SIGNING_ALLOWED=NO \
-              clean build \
-            | tee build/xcodebuild.log
+          XCRESULT="$PWD/build/BuildResult.xcresult"
+          xcodebuild \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -sdk iphonesimulator \
+            -destination "$DESTINATION" \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath "$PWD/build/DerivedData" \
+            -resultBundlePath "$XCRESULT" \
+            clean build | tee "$PWD/build/xcodebuild.log"
+          STATUS=${PIPESTATUS[0]}
+          echo "build_log_path=$PWD/build/xcodebuild.log" >> "$GITHUB_OUTPUT"
+          if [ -d "$XCRESULT" ]; then
+            echo "xcresult_path=$XCRESULT" >> "$GITHUB_OUTPUT"
           fi
+          exit $STATUS
 
-      # 📦 Always upload logs/results so you can inspect failures
-      - name: Upload result bundle
+      - name: Upload artifacts (logs & xcresult)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: BuildResult.xcresult
-          path: build/BuildResult.xcresult
-
-      - name: Upload raw xcodebuild log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcodebuild.log
-          path: build/xcodebuild.log
+          name: build-artifacts
+          path: |
+            ${{ steps.build.outputs.build_log_path }}
+            ${{ steps.build.outputs.xcresult_path }}
+            build/DerivedData/Logs/Build/*.xcactivitylog
+          if-no-files-found: warn
