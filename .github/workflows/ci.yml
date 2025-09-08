@@ -25,4 +25,4 @@ jobs:
 
       - name: Build app
         run: |
-          xcodebuild -project NiyasKitchenInventory.xcodeproj -scheme NiyasKitchenInventory -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' clean build CODE_SIGNING_ALLOWED=NO
+          xcodebuild -project NiyasKitchenInventory.xcodeproj -scheme NiyasKitchenInventory -destination 'platform=iOS Simulator,name=iPhone 14,OS=17.5' clean build CODE_SIGNING_ALLOWED=NO
