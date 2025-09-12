@@ -31,14 +31,30 @@ struct DashboardView: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(Color.textPrimary)
                     
-                    HStack(alignment: .center, spacing: 15) {
-                        PillButtonView(title: "StockIn")
-                        PillButtonView(title: "StockOut")
-                    }
                     
                     HStack(alignment: .center, spacing: 15) {
-                        PillButtonView(title: "Punch In")
-                        PillButtonView(title: "Punch Out")
+                        PillButtonView(title: "Punch In") {
+                            print("Punch In")
+                        }
+                        PillButtonView(title: "Punch Out") {
+                            print("Punch Out")
+                        }
+                    }
+                    
+                    
+                    
+                    HStack(alignment: .center, spacing: 15) {
+                        
+                        NavigationLink {
+                            POView()
+                        } label: {
+                           
+                            Text("Purchase orders")
+                                .padding()
+                                .foregroundStyle(Color.white)
+                                .font(.system(size: 16, weight: .semibold))
+                                .background(Capsule().fill(Color.brandPrimary))
+                        }
                     }
                     
                     

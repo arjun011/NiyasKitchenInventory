@@ -60,23 +60,94 @@ class POServices {
     }
 
     func replaceLines(poId: String, lines: [POLineModel]) async throws {
-        let col = db.collection("purchaseOrders").document(poId).collection(
-            "lines")
+        let linesRef = db.collection("purchaseOrders").document(poId)
+            .collection(
+                "lines")
         let batch = db.batch()
 
         // delete existing lines first (draft edit case)
-        let existing = try await col.getDocuments()
+        let existing = try await linesRef.getDocuments()
         for doc in existing.documents { batch.deleteDocument(doc.reference) }
 
         // add new lines
         for line in lines {
-            let docRef = col.document()
+            let docRef = linesRef.document()
             var payload = line
             payload.id = docRef.documentID
             try batch.setData(from: payload, forDocument: docRef, merge: false)
         }
 
         try await batch.commit()
+
+        // Update lineCount fields in PO doc
+        let snapshot = try await linesRef.getDocuments()
+        let count = snapshot.documents.count
+
+        try await db.collection("purchaseOrders").document(poId).updateData([
+            "lineCount": count,
+            "updatedAt": FieldValue.serverTimestamp(),
+        ])
+
+    }
+
+}
+
+//MARK: - PO Details -
+extension POServices {
+
+    func fetchLines(poId: String) async throws -> [POLineModel] {
+        let snap = try await db.collection("purchaseOrders").document(poId)
+            .collection("lines").getDocuments()
+        return try snap.documents.map { try $0.data(as: POLineModel.self) }
+    }
+
+    func deleteLine(poId: String, lineId: String) async throws {
+
+        let poRef = db.collection("purchaseOrders").document(poId)
+        let lineRef = poRef.collection("lines").document(lineId)
+
+        let batch = db.batch()
+        batch.deleteDocument(lineRef)
+        batch.updateData(
+            [
+                "lineCount": FieldValue.increment(Int64(-1)),
+                "updatedAt": FieldValue.serverTimestamp(),
+            ], forDocument: poRef)
+        try await batch.commit()
+
+    }
+
+    func updateOrderStatus(poId: String, status: POStatus) async throws {
+
+        let poRef = db.collection("purchaseOrders").document(poId)
+        let batch = db.batch()
+
+        switch status {
+
+        case .sent:
+            batch.updateData(
+                [
+                    "status": status.rawValue,
+                    "updatedAt": FieldValue.serverTimestamp(),
+                    "sentAt": FieldValue.serverTimestamp(),
+                ], forDocument: poRef)
+
+        case .partial:
+            break
+        case .received:
+            break
+        case .closed, .canceled:
+            batch.updateData(
+                [
+                    "status": status.rawValue,
+                    "updatedAt": FieldValue.serverTimestamp(),
+                ], forDocument: poRef)
+
+        default:
+            break
+        }
+        try await batch.commit()
+
     }
 
 }

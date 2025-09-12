@@ -9,6 +9,8 @@ import SwiftUI
 
 struct TabShellView: View {
 
+    @Environment(AppSession.self) var session
+    
     enum TabSection: Hashable {
         case dashbaord, inventory, movements, reports, settings
     }
@@ -40,18 +42,26 @@ struct TabShellView: View {
                     MovementsView()
                 
             }
-
+           
             Tab("Reports", systemImage: "chart.bar.fill", value: .reports) {
                 
                 NavigationStack {
-                    CreatePOView()
+                    POView()
                 }
                 
                 
             }
 
             Tab("Settings", systemImage: "gearshape.fill", value: .settings) {
-                Text("Reports")
+               
+                VStack {
+                  
+                    Text("Sign out")
+                    
+                }.task {
+                    await session.signOut()
+                }
+                
             }
 
         }.tint(Color.brandPrimary)

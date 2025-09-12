@@ -8,15 +8,13 @@
 import SwiftUI
 
 struct PillButtonView: View {
-    
     var title:String
-    
+    var action: () -> Void
     var body: some View {
         
         Button {
-            
+            action()
         } label: {
-            
             Text(title)
                 .foregroundStyle(Color.white)
                 .font(.system(size: 16, weight: .semibold))
@@ -32,5 +30,7 @@ struct PillButtonView: View {
 }
 
 #Preview {
-    PillButtonView(title: "Stock In")
+    PillButtonView(title: "Stock In") {
+        print("Stock In")
+    }
 }
