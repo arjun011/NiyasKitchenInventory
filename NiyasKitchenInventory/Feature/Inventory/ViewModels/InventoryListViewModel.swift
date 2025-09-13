@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable class InventoryListViewModel {
+@MainActor @Observable class InventoryListViewModel {
 
     private let services = InventoryListServices()
     private let supplierServies = AddEditInventoryServices()

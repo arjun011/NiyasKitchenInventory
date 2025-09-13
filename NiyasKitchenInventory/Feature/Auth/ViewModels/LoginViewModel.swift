@@ -6,10 +6,10 @@
 //
 
 import Combine
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
 import Foundation
 
-@Observable final class LoginViewModel {
+@MainActor @Observable final class LoginViewModel {
 
     var email: String = ""
     var password: String = ""

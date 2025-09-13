@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable final class PODetailsViewModel {
+@MainActor @Observable final class PODetailsViewModel {
 
     var lines: [POLineModel] = []
     private let services = POServices()

@@ -16,7 +16,7 @@ struct UserProfile {
     let email: String?
 }
 
-@Observable class AppSession {
+@MainActor @Observable class AppSession {
 
     // Auth & Profile
     var authUser: User?
@@ -34,7 +34,7 @@ struct UserProfile {
             [weak self] _, user in
             guard let self else { return }
 
-            Task { @MainActor in
+            Task {
                 self.authUser = user
                 if let uid = user?.uid {
                     await self.loadProfile(uid: uid)

@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import FirebaseFirestore
-struct POLineModel: Codable, Identifiable, Hashable {
+@preconcurrency import FirebaseFirestore
+struct POLineModel: Codable, Identifiable, Hashable, Sendable {
 
     @DocumentID var id: String? 
     var itemName: String

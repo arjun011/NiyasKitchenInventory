@@ -10,7 +10,7 @@ import FirebaseCore
 import FirebaseFirestore
 import Foundation
 
-@Observable final class AddEditInventoryViewModel {
+@MainActor @Observable final class AddEditInventoryViewModel {
 
     var isLoading:Bool = false
     var name: String = ""

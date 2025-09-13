@@ -10,9 +10,9 @@ import Firebase
 import FirebaseCore
 import FirebaseFirestore
 
-class InventoryListServices {
+struct InventoryListServices: Sendable {
 
-    private let db = Firestore.firestore()
+    private var db: Firestore { Firestore.firestore() }
     
     func fetchInventory() async throws -> [InventoryItemModel] {
      

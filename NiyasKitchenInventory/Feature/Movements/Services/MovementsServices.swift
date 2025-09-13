@@ -7,7 +7,7 @@
 
 import Foundation
 import Firebase
-final class MovementsServices {
+struct MovementsServices : Sendable{
     
     enum GeneralError: LocalizedError {
         case inventoryMissing(String)
@@ -28,7 +28,7 @@ final class MovementsServices {
         }
     }
 
-    private let db = Firestore.firestore()
+    private var db:Firestore {Firestore.firestore() }
     
     
     func fetchMovements() async throws -> [MovementModel] {

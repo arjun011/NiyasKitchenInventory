@@ -10,7 +10,7 @@ import FirebaseCore
 import FirebaseFirestore
 import Foundation
 
-final class AddEditInventoryServices {
+struct AddEditInventoryServices: Sendable {
 
     enum GeneralError: LocalizedError {
         case nameEmpty
@@ -27,8 +27,7 @@ final class AddEditInventoryServices {
         }
     }
 
-    private let db = Firestore.firestore()
-
+    private var db:Firestore { Firestore.firestore() }
 
     // Generic function for SaveData on FireStore Collection
     func saveData<T:Codable>(collection: String, object : T) async throws -> T {

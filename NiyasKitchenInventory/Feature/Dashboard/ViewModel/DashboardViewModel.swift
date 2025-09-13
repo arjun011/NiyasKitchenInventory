@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@Observable final class DashboardViewModel {
+@MainActor @Observable final class DashboardViewModel {
     
     var totalInventoryCount:Int = 0
     var lowStockInventoryCount:Int = 0

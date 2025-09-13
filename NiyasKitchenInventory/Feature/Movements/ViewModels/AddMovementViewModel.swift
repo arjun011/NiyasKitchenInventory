@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable final class AddMovementViewModel {
+@MainActor @Observable final class AddMovementViewModel {
     
     var quantity:String = ""
     var typesOfMovement:MovementType = .in

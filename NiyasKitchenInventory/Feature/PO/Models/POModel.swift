@@ -5,10 +5,10 @@
 //  Created by Arjun on 04/09/25.
 //
 
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 import Foundation
 
-struct POModel: Codable, Identifiable {
+struct POModel: Codable, Identifiable, Sendable {
     @DocumentID var id: String?
     var supplierId: String
     var supplierName: String
@@ -41,7 +41,7 @@ struct POModel: Codable, Identifiable {
 
 }
 
-var mocPOModel = POModel(
+nonisolated(unsafe) var mocPOModel = POModel(
     id: "queXcMwgYdXkFUF5PQZy",
     supplierId: "sdd",
     supplierName: "Giro",

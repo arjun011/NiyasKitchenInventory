@@ -8,7 +8,7 @@
 import Firebase
 import Foundation
 
-class POServices {
+struct POServices: Sendable {
 
     enum POServicesError: LocalizedError {
         case itemsNotFound
@@ -20,7 +20,7 @@ class POServices {
         }
     }
 
-    private let db = Firestore.firestore()
+    private var db:Firestore { Firestore.firestore() }
 
     func getInventoriesBy(supplierID: String) async throws -> [POLineModel] {
 

@@ -8,7 +8,7 @@
 import FirebaseAuth
 import Foundation
 
-@Observable class ForgotPasswordViewModel {
+@MainActor @Observable class ForgotPasswordViewModel {
 
     var email: String = ""
     var errorMessage: String?

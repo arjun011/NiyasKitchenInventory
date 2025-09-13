@@ -161,7 +161,7 @@ struct PODetailsView: View {
         private func makeEmailBody(po: POModel, lines: [POLineModel]) -> String {
             let date = DateFormatter.localizedString(from: po.expectedDate ?? Date(), dateStyle: .medium, timeStyle: .none)
             let items = lines.map { "• \($0.itemName): \(Double($0.orderedQty ?? 0)) \($0.unitName)" }.joined(separator: "\n")
-            var body = """
+            let body = """
             Hello \(po.supplierName),
 
             Please find our purchase order:

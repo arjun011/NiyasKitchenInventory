@@ -8,7 +8,7 @@
 import Foundation
 import Firebase
 
-@Observable final class POViewModel {
+@MainActor @Observable final class POViewModel {
 
     private let services = POServices()
     var fetchStatus:POStatus = .all

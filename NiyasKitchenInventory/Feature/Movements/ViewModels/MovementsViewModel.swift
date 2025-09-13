@@ -7,11 +7,11 @@
 
 import Foundation
 
-@Observable final class MovementsViewModel {
+@MainActor @Observable final class MovementsViewModel {
     
     var showInventoryList:Bool = false
     var movementList:[MovementModel] = []
-    private let service = MovementsServices()
+    nonisolated private let service = MovementsServices()
     var filteredType:MovementType = .all
     var range: RangeFilter = .today
     

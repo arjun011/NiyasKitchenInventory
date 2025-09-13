@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Observable final class CreatePOViewModel {
+@MainActor @Observable final class CreatePOViewModel {
 
     var supplierName: String = ""
     var email: String = ""
@@ -46,11 +46,6 @@ import Foundation
             selections.contains($0.id)
         }
         return selectedItems
-    }
-
-    deinit {
-        print("sequence driven example deinit")
-        task?.cancel()
     }
 
     func fetchSupplierList() async {
