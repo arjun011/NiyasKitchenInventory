@@ -8,14 +8,6 @@
 import SwiftUI
 
 struct POView: View {
-<<<<<<< HEAD
-    var body: some View {
-        ZStack {
-            VStack {
-                
-            }
-=======
-    
     @State var vm = POViewModel()
     
     var body: some View {
@@ -33,7 +25,7 @@ struct POView: View {
             }
         }.task {
             await vm.getPurachaseOrderOn(status: .all)
->>>>>>> purchase-orders-mvp
+
         }.navigationTitle("Purchase Orders")
         .navigationBarTitleDisplayMode(.automatic)
         .toolbar {
