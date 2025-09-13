@@ -10,14 +10,14 @@ import Firebase
 
 @Observable final class POViewModel {
 
-
     private let services = POServices()
     var fetchStatus:POStatus = .all
+    var poList:[POModel] = []
     
     func getPurachaseOrderOn(status: POStatus) async {
         
         do {
-            var poList  = try await services.fetchPurchaseOrderListOn(status: fetchStatus)
+            poList  = try await services.fetchPurchaseOrderListOn(status: fetchStatus)
             print(poList)
         }catch{
             print(error)

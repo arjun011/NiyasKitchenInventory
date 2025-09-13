@@ -66,17 +66,31 @@ struct CreatePOView: View {
                     ForEach(vm.orderItemList) { item in
 
                         LabeledContent {
-                               Text("\(item.orderedQty ?? 0, format: .number) \(item.unitName)")
-                           } label: {
-                               Text(item.itemName)
-                           }
+                            Text(
+                                "\(item.orderedQty ?? 0, format: .number) \(item.unitName)"
+                            )
+                        } label: {
+                            Text(item.itemName)
+                        }
+
+                    }.onDelete { offsets in
+
+                        if let index = offsets.first {
+
+                            let item = vm.orderItemList[index]
+
+                            // Remove locally
+                            vm.selections.remove(item.id ?? "")
+                        }
 
                     }
 
                     NavigationLink {
 
-                        POItemsListView(orderItemList: $vm.supplierItemsList, selections: $vm.selections)
-                       
+                        POItemsListView(
+                            orderItemList: $vm.supplierItemsList,
+                            selections: $vm.selections)
+
                     } label: {
                         Label("Add Item", systemImage: "text.badge.plus")
                             .listItemTint(Color.brandPrimary)
@@ -114,9 +128,10 @@ struct CreatePOView: View {
                     Button {
 
                         Task {
-                            await vm.saveDraftBy(userID: session.profile?.uid ?? "")
+                            await vm.saveDraftBy(
+                                userID: session.profile?.uid ?? "")
                         }
-                        
+
                     } label: {
                         Text("Save Draft")
                             .foregroundStyle(Color.brandPrimary)
