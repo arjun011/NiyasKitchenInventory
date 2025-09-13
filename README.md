@@ -1,38 +1,64 @@
-# 📦 NiyasKitchenInventory – iOS App
+# 🍽️ NiyasKitchenInventory  
 
-An iOS app built with SwiftUI and Firebase, designed to help single-location restaurants manage inventory, track usage, reduce waste, and streamline ordering.
+**NiyasKitchenInventory** is a custom-built **iOS app** for managing restaurant inventory, suppliers, and purchase orders. It’s designed for **single-restaurant teams** who need lightweight but powerful stock tracking — and doubles as a **portfolio project** showcasing modern iOS development practices.  
 
-## ✅ Features
-- Ingredient & packaging stock tracking
-- Daily usage & waste logging
-- Purchase Order (PO) creation
-- Role-based access (Admin, Kitchen Staff, Stock Manager)
-- Reorder alerts
-- Weekly usage reports
-- Firebase Auth + Firestore backend
+---
 
-## 🔧 Tech Stack
-- Uses `ObservableObject` for state management
-- Combine framework for reactive data binding
-- Swift Concurrency (`async/await`) for clean asynchronous code
-- Swift 6 + SwiftUI
-- Firebase Firestore, Auth, Cloud Functions
-- MVVM Architecture
-- Charts (optional)
+## 🚀 Features  
 
-## 📋 Project Milestones
+- **Authentication** – Firebase Email/Password login & user roles (Admin / Staff)  
+- **Dashboard** – Quick KPIs (low stock, waste tracking, weekly stats)  
+- **Inventory Management** – Add/edit/delete items, units, categories, suppliers  
+- **Stock Movements** – Track IN / OUT / Waste, with automatic quantity updates  
+- **Purchase Orders (PO)** – Create, send, and manage supplier orders with line items  
+- **Punch In/Out (Attendance)** – Log staff shifts, view weekly/monthly total hours  
+- **Firestore Integration** – Real-time sync of all data across devices  
+- **Role-based Access** – Admin creates users & manages permissions  
 
-- [Login Module Milestone Plan](Docs/Milestones/login_milestone_plan.md)
+---
 
+## 🛠️ Tech Stack  
+
+- **Language:** Swift 6  
+- **UI Framework:** SwiftUI  
+- **Architecture:** MVVM with `@Observable`, Swift Concurrency (`async/await`)  
+- **Backend:** Firebase (Auth, Firestore, Storage)  
+- **CI/CD:** GitHub Actions (build workflows, unit tests planned)  
+- **Tools:**  
+  - P4Merge (merge conflict resolution)  
+  - Xcode 16.1 (iOS 17.4 minimum deployment target)  
+
+---
+## 🧪 Testing & CI/CD  
+
+- **Unit Tests:** Planned using XCTest for services & ViewModels  
+- **CI/CD:** GitHub Actions workflow configured  
+  - Runs `xcodebuild clean build` on pull requests  
+  - Detects breaking changes early  
+  - Next step: integrate unit tests into CI  
+
+---
 ## 📸 Screenshots & Diagrams
 > Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
 
-## 🚀 Future Improvements
-- Offline mode with sync
-- Multi-language support
-- POS integration
+## 💡 What I Learned  
 
-## 👤 Author
-- Arjun Patel
+- Implementing **Swift Concurrency** safely with `Sendable` & actor isolation  
+- Handling **Firestore schema design** (inventory, suppliers, POs, movements)  
+- Setting up **CI/CD with GitHub Actions** for iOS projects  
+- Managing **merge conflicts** with P4Merge and Xcode merge editor  
+- Building a full app workflow from login → dashboard → inventory → orders  
+
+---
+
+## 🧑‍💻 Author  
+
+Developed by **Arjun Patel**  
+👨‍🍳 Founder of **Niya’s Kitchen**, passionate about **Swift development & restaurant tech**  
+
+---
+
+⚡ *This project is both a production tool for my restaurant and a showcase of my iOS engineering skills for potential employers.* 
+
 
 
