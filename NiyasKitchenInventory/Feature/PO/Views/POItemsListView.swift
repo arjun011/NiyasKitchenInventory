@@ -23,17 +23,38 @@ struct POItemsListView: View {
         VStack {
 
             List(orderItemList, selection: $selections) { item in
+                
+                VStack(alignment: .leading, content: {
 
-                HStack {
-                      Text(item.itemName)
-                      Spacer()
-                      Text("\(item.orderedQty ?? 0, format: .number) \(item.unitName)")
-                          .onTapGesture {
-                              editingID = item.id
-                              qtyText = String(item.orderedQty ?? 0)
-                              showQtyAlert = true
-                          }
-                  }
+                    HStack {
+
+                        Text(item.itemName)
+                        
+                        if item.isLowStock {
+                            Text("LOW STOCK")
+                                .font(.caption2.weight(.regular))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.appDanger, in: Capsule())
+                                .padding(.top, 4)
+                        }
+                        Spacer()
+                        Text(
+                            "\(item.orderedQty ?? 0, format: .number) \(item.unitName)"
+                        )
+                        .onTapGesture {
+                            editingID = item.id
+                            qtyText = String(item.orderedQty ?? 0)
+                            showQtyAlert = true
+                        }
+                    }
+                    
+                    Text("stock: \(item.quantity, format: .number) \(item.unitName)")
+                        .font(.subheadline.weight(.light))
+                        .foregroundStyle(Color.secondary)
+                    
+                })
             }
 
         }.alert(

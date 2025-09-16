@@ -14,14 +14,16 @@ struct POLineModel: Codable, Identifiable, Hashable, Sendable {
     var unitName: String
     var receivedQty: Double?
     var lastReceivedAt: Date?
-    var lowStockThreshold: Double?
+    var lowStockThreshold: Double
     var orderedQty: Double?
+    var quantity: Double
+    var isLowStock: Bool { quantity <= lowStockThreshold }
 
     enum CodingKeys: String, CodingKey {
         case id
         case itemName = "name"
         case unitName = "unit"
-        case receivedQty, lastReceivedAt, lowStockThreshold,orderedQty
+        case receivedQty, lastReceivedAt, lowStockThreshold,orderedQty, quantity
 
     }
 
