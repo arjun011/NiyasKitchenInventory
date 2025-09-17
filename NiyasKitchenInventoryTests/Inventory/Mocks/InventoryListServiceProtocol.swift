@@ -7,6 +7,7 @@
 
 import Foundation
 @testable import NiyasKitchenInventory
-final class MockInventoryListServices: InventoryListServices {
+protocol InventoryListServiceProtocol: Sendable {
     
+    func fetchInventory() async throws -> [InventoryItemModel]
 }
