@@ -39,6 +39,11 @@
 
 ---
 ## 📸 Screenshots & Diagrams
+<p float="left">
+  <img src="Docs/Flowcharts/splash.png" width="45%" />
+  &nbsp; &nbsp;
+  <img src="docs/test-coverage-screenshot.png" width="45%" />
+</p>
 > Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
 
 ## 💡 What I Learned  
