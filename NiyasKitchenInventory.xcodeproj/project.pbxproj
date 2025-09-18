@@ -48,14 +48,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		DC074B0D2E7ACAC100398A55 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Feature/Inventory/Services/AddEditInventoryServices.swift,
-				Feature/Inventory/Services/InventoryListServices.swift,
-			);
-			target = DC074AFB2E7ACA8800398A55 /* NiyasKitchenInventoryTests */;
-		};
 		DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -75,7 +67,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */,
-				DC074B0D2E7ACAC100398A55 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */,
 			);
 			path = NiyasKitchenInventory;
 			sourceTree = "<group>";

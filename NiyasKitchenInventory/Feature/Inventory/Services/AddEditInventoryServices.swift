@@ -10,7 +10,7 @@ import FirebaseCore
 import FirebaseFirestore
 import Foundation
 
-struct AddEditInventoryServices: Sendable {
+struct AddEditInventoryServices: AddEditInventoryServicesProtocol {
 
     enum GeneralError: LocalizedError {
         case nameEmpty

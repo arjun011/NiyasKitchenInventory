@@ -10,7 +10,7 @@ import Firebase
 import FirebaseCore
 import FirebaseFirestore
 
-struct InventoryListServices: Sendable {
+struct InventoryListServices: InventoryListServiceProtocol {
 
     private var db: Firestore { Firestore.firestore() }
     

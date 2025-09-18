@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@testable import NiyasKitchenInventory
+
 protocol InventoryListServiceProtocol: Sendable {
     
     func fetchInventory() async throws -> [InventoryItemModel]

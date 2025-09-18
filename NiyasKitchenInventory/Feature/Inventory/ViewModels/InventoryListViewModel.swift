@@ -9,8 +9,15 @@ import Foundation
 
 @MainActor @Observable class InventoryListViewModel {
 
-    private let services = InventoryListServices()
-    private let supplierServies = AddEditInventoryServices()
+    private let services: InventoryListServiceProtocol
+    private let supplierServies: AddEditInventoryServicesProtocol
+    
+    init(services: InventoryListServiceProtocol = InventoryListServices(), supplierServies:AddEditInventoryServicesProtocol = AddEditInventoryServices() ) {
+        self.services = services
+        self.supplierServies = supplierServies
+    }
+    
+    
     var isLoading:Bool = false
     var inventoryItems: [InventoryItemModel] = []
     var searchText: String = ""
