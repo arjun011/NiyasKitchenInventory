@@ -42,7 +42,24 @@
 <p float="left">
   <img src="Docs/Flowcharts/splash.png" width="45%" />
   &nbsp; &nbsp;
-  <img src="docs/test-coverage-screenshot.png" width="45%" />
+    <img src="Docs/Flowcharts/login.png" width="45%" />
+  &nbsp; &nbsp;
+    <img src="Docs/Flowcharts/dashboard.png" width="45%" />
+  &nbsp; &nbsp;
+    <img src="Docs/Flowcharts/inventory.png" width="45%" />
+  &nbsp; &nbsp;
+    <img src="Docs/Flowcharts/movements.png" width="45%" />
+  &nbsp; &nbsp;
+    <img src="Docs/Flowcharts/purchaseOrder.png" width="45%" />
+  &nbsp; &nbsp;
+    <img src="Docs/Flowcharts/draft.png" width="45%" />
+  &nbsp; &nbsp;
+      <img src="Docs/Flowcharts/AddMovement.png" width="45%" />
+  &nbsp; &nbsp;
+      <img src="Docs/Flowcharts/AddInventory.png" width="45%" />
+  &nbsp; &nbsp;
+        <img src="Docs/Flowcharts/filter.png" width="45%" />
+  &nbsp; &nbsp;
 </p>
 > Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
 
