@@ -11,6 +11,14 @@ import FirebaseFirestore
 import Foundation
 
 @MainActor @Observable final class AddEditInventoryViewModel {
+    
+    private let service:AddEditInventoryServicesProtocol
+    
+    init(service: AddEditInventoryServicesProtocol = AddEditInventoryServices()) {
+        self.service = service
+    }
+    
+    
 
     var isLoading:Bool = false
     var name: String = ""
@@ -51,7 +59,7 @@ import Foundation
 
     }
 
-    private let service = AddEditInventoryServices()
+    
 
     func getUnits() async {
 
