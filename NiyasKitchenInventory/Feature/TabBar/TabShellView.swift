@@ -54,13 +54,19 @@ struct TabShellView: View {
 
             Tab("Settings", systemImage: "gearshape.fill", value: .settings) {
                
-                VStack {
-                  
-                    Text("Sign out")
-                    
-                }.task {
-                    await session.signOut()
+                
+                NavigationStack {
+                    SettingsView()
                 }
+                
+                
+//                VStack {
+//                  
+//                    Text("Sign out")
+//                    
+//                }.task {
+//                    await session.signOut()
+//                }
                 
             }
 

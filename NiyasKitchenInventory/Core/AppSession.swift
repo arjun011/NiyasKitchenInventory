@@ -8,9 +8,10 @@
 import Firebase
 import FirebaseAuth
 import Foundation
+@preconcurrency import FirebaseFirestore
 
-struct UserProfile {
-    let uid: String
+struct UserProfile:Codable {
+    @DocumentID var uid: String?
     let role: String
     let displayName: String?
     let email: String?
