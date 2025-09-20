@@ -14,7 +14,7 @@ struct SettingsView: View {
             Section {
                 
                 NavigationLink {
-                    AttendanceView()
+                    AttendanceReportView()
                 } label: {
                     Text("Attendance report")
                 }
