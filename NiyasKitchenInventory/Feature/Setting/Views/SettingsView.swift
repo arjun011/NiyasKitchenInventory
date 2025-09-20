@@ -8,24 +8,40 @@
 import SwiftUI
 
 struct SettingsView: View {
+    
+    @Environment(AppSession.self) private var session
+    
     var body: some View {
-        
+
         Form {
             Section {
-                
+
                 NavigationLink {
                     AttendanceReportView()
                 } label: {
                     Text("Attendance report")
                 }
-                
-                
+
             } header: {
                 Text("User")
             }
 
+            Section {
+
+                Button(role: .destructive) {
+                    Task {
+
+                        await session.signOut()
+
+                    }
+                } label: {
+                    Text("Sign out")
+                }
+
+            }
+
         }
-        
+
     }
 }
 
@@ -33,5 +49,5 @@ struct SettingsView: View {
     NavigationStack {
         SettingsView()
     }
-    
+
 }

@@ -94,8 +94,11 @@ struct DashboardView: View {
                 group.addTask { await vm.getInventoryList() }
                 group.addTask { await vm.getWasteCount() }
                 group.addTask {
+                    guard let userId = await session.profile?.uid else {
+                        return
+                    }
                     await vm.checkPunchStateOnAppOpen(
-                        userId: session.profile?.uid ?? "")
+                        userId: userId)
                 }
             }
         }

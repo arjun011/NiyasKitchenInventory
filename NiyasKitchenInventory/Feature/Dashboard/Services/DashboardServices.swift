@@ -13,7 +13,6 @@ struct DashboardServices: Sendable {
     
     private var db:Firestore { Firestore.firestore() }
     
-    
     func getPunches(userId: String, date: Date) async throws -> [PunchModel] {
         let dateString = formatDate(date)
         let punchesRef = db.collection("users")
