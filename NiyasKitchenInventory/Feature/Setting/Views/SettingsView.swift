@@ -25,6 +25,18 @@ struct SettingsView: View {
             } header: {
                 Text("User")
             }
+            
+            Section {
+
+                NavigationLink {
+                    DailySalesView()
+                } label: {
+                    Text("Daily Sales")
+                }
+
+            } header: {
+                Text("Sales")
+            }
 
             Section {
 
