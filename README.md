@@ -39,29 +39,20 @@
 
 ---
 ## 📸 Screenshots & Diagrams
-<p float="left">
-  <img src="Docs/Flowcharts/splash.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/login.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/dashboard.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/inventory.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/movements.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/purchaseOrder.png" width="45%" />
-  &nbsp; &nbsp;
-    <img src="Docs/Flowcharts/draft.png" width="45%" />
-  &nbsp; &nbsp;
-      <img src="Docs/Flowcharts/AddMovement.png" width="45%" />
-  &nbsp; &nbsp;
-      <img src="Docs/Flowcharts/AddInventory.png" width="45%" />
-  &nbsp; &nbsp;
-        <img src="Docs/Flowcharts/filter.png" width="45%" />
-  &nbsp; &nbsp;
-</p>
-> Add screenshots or GIFs of the app UI, plus schema and flowcharts here.
+<div style="display: flex; overflow-x: auto; gap: 12px; padding: 12px;">
+  <img src="Docs/Flowcharts/splash.png" width="300" />
+  <img src="Docs/Flowcharts/login.png" width="300" />
+  <img src="Docs/Flowcharts/dashboard.png" width="300" />
+  <img src="Docs/Flowcharts/inventory.png" width="300" />
+  <img src="Docs/Flowcharts/movements.png" width="300" />
+  <img src="Docs/Flowcharts/purchaseOrder.png" width="300" />
+  <img src="Docs/Flowcharts/draft.png" width="300" />
+  <img src="Docs/Flowcharts/AddMovement.png" width="300" />
+  <img src="Docs/Flowcharts/AddInventory.png" width="300" />
+  <img src="Docs/Flowcharts/filter.png" width="300" />
+  <img src="Docs/Flowcharts/attendanceReport.png" width="300" />
+</div>
+
 
 ## 💡 What I Learned  
 
