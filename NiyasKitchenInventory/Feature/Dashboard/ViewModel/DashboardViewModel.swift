@@ -27,6 +27,14 @@ import Foundation
 
     private let repo = DashboardServices()
 
+    // Booking reservation
+    var bookingCount: Int = 0
+    var bookingTitle: String = "No Bookings"
+    var selectedDate: Date? = nil
+    var showBookingsList: Bool = false
+
+    private var bookingServices = BookingServices()
+
     func getInventoryList() async {
 
         do {
@@ -155,4 +163,44 @@ extension DashboardViewModel {
         return formatter.string(from: date)
     }
 
+}
+
+//MARK: - Booking reservation -
+extension DashboardViewModel {
+
+    func loadBookings() async {
+        do {
+            let bookings = try await bookingServices.loadBookings()
+
+            let today = Calendar.current.startOfDay(for: Date())
+            let todayBookings = bookings.filter {
+                Calendar.current.isDate($0.dateTime, inSameDayAs: today)
+            }
+
+            if !todayBookings.isEmpty {
+                self.bookingCount = todayBookings.count
+                self.bookingTitle = "Today's Bookings"
+                self.selectedDate = today
+            } else {
+                // Find next upcoming date
+                if let nextBooking =
+                    bookings
+                    .sorted(by: { $0.dateTime < $1.dateTime })
+                    .first(where: { $0.dateTime > today })
+                {
+
+                    self.bookingCount = 0
+                    self.bookingTitle =
+                        "Next Booking on \(nextBooking.dateTime.formatted(date: .abbreviated, time: .omitted))"
+                    self.selectedDate = nextBooking.dateTime
+                } else {
+                    self.bookingTitle = "No Upcoming Bookings"
+                    self.bookingCount = 0
+                }
+            }
+
+        } catch {
+            print("Failed to fetch bookings: \(error)")
+        }
+    }
 }

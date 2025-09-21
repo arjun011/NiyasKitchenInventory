@@ -7,19 +7,18 @@
 
 import SwiftUI
 
-
-
-
 struct KIPStatCardView: View {
 
     var title: String
     var value: Int
     var icon: String
     var bgColor: Color
+    var action: () -> Void
 
     var body: some View {
 
         Button {
+            action()
 
         } label: {
 
@@ -57,5 +56,7 @@ struct KIPStatCardView: View {
 #Preview {
     KIPStatCardView(
         title: "Total Items", value: 100, icon: "cube.box.fill",
-        bgColor: Color.appWarning)
+        bgColor: Color.appWarning) {
+            print("Action")
+        }
 }

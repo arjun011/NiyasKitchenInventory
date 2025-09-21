@@ -11,7 +11,10 @@ struct DashboardView: View {
 
     @Environment(AppSession.self) private var session
     @State private var vm = DashboardViewModel()
-
+    
+    private enum Route: Hashable {
+        case reservationView
+    }
     var body: some View {
 
         ScrollView {
@@ -19,20 +22,34 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 16) {
                 KIPStatCardView(
                     title: "Total Items", value: vm.totalInventoryCount,
-                    icon: "cube.box.fill", bgColor: Color.brandPrimary)
+                    icon: "cube.box.fill", bgColor: Color.brandPrimary) {
+                        
+                    }
 
                 KIPStatCardView(
                     title: "Low Stock", value: vm.lowStockInventoryCount,
                     icon: "exclamationmark.triangle.fill",
-                    bgColor: Color.appWarning)
+                    bgColor: Color.appWarning) {
+                        
+                    }
 
                 KIPStatCardView(
                     title: "Needs Review (7d)", value: vm.staleInventoryCount,
-                    icon: "clock.fill", bgColor: Color.brandPrimary)
+                    icon: "clock.fill", bgColor: Color.brandPrimary) {
+                        
+                    }
 
                 KIPStatCardView(
                     title: "Waste This Week", value: vm.wasteLastSevenDayCount,
-                    icon: "trash.fill", bgColor: Color.appDanger)
+                    icon: "trash.fill", bgColor: Color.appDanger) {
+                        
+                    }
+                
+                KIPStatCardView(
+                    title: vm.bookingTitle, value: vm.bookingCount,
+                    icon: "calendar", bgColor: Color.brandPrimary) {
+                        
+                    }
 
                 VStack(
                     alignment: .leading,
@@ -93,6 +110,7 @@ struct DashboardView: View {
             await withTaskGroup(of: Void.self) { group in
                 group.addTask { await vm.getInventoryList() }
                 group.addTask { await vm.getWasteCount() }
+                group.addTask { await vm.loadBookings() }
                 group.addTask {
                     guard let userId = await session.profile?.uid else {
                         return
