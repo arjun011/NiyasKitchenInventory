@@ -8,24 +8,37 @@
 import SwiftUI
 
 struct ReservationView: View {
-    var body: some View {
-        
-        VStack {
-            Text("Hello, World!")
-        }.navigationTitle("Reservation")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        BookingFormView()
-                    } label: {
-                        Image(systemName: "plus.circle")
-                            .tint(Color.brandPrimary)
-                    }
 
+    @State private var vm = BookingFormViewModel()
+
+    var body: some View {
+
+        ZStack{
+            List {
+                ForEach(vm.allBookings) { booking in
+                    ReservationRowView(booking: booking)
+                    
+                }
+            }.blur(radius: vm.isLoading ? 1: 0)
+            
+            if vm.isLoading {
+                ProgressView("Loading bookings...")
+            }
+            
+        }.task {
+            await vm.loadBookings()
+        }.navigationTitle("Bookings")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    BookingFormView()
+                } label: {
+                    Image(systemName: "plus.circle")
+                        .tint(Color.brandPrimary)
                 }
             }
-        
-        
+        }
+       
     }
 }
 
@@ -33,5 +46,5 @@ struct ReservationView: View {
     NavigationStack {
         ReservationView()
     }
-    
+
 }

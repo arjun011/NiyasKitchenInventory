@@ -23,9 +23,8 @@ struct TabShellView: View {
 
             Tab("Dashboard", systemImage: "house.fill", value: .dashbaord) {
                 
-                NavigationStack {
-                    DashboardView()
-                }
+                DashboardView()
+                
             }
 
             Tab("Inventory", systemImage: "shippingbox.fill", value: .inventory) {

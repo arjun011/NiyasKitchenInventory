@@ -12,11 +12,17 @@ import Foundation
 
 struct BookingModel: Codable, Identifiable, Sendable {
     @DocumentID var id: String?
-    var name: String
-    var phoneNumber: String
-    var guests: Int
-    var dateTime: Date
-    var note: String?
-    var createdAt: Timestamp
-    var bookedBy:String
+    let name: String
+    let phoneNumber: String
+    let guests: Int
+    let dateTime: Date
+    let note: String?
+    let createdAt: Timestamp
+    let bookedBy:String
+    var isToday: Bool {
+        Calendar.current.isDateInToday(dateTime)
+    }
+    var displaydateTime:String {
+        isToday ? dateTime.formatted(date: .omitted, time: .shortened) : dateTime.formatted(date: .abbreviated, time: .shortened)
+    }
 }
