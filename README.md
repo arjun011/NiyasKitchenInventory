@@ -12,8 +12,8 @@
 - **Stock Movements** – Track IN / OUT / Waste, with automatic quantity updates  
 - **Purchase Orders (PO)** – Create, send, and manage supplier orders with line items  
 - **Punch In/Out (Attendance)** – Log staff shifts, view weekly/monthly total hours  
-- **Daily Sales Reports ** – Staff can enter daily collection totals (Card, Cash, Uber Eats, etc.)
-- **Table Bookings ** – Add/view reservations, highlight today’s bookings with sections by date
+- **Daily Sales Reports** – Staff can enter daily collection totals (Card, Cash, Uber Eats, etc.)
+- **Table Bookings** – Add/view reservations, highlight today’s bookings with sections by date
 - **Firestore Integration** – Real-time sync of all data across devices  
 - **Role-based Access** – Admin creates users & manages permissions  
 
