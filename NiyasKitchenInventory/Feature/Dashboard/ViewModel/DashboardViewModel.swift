@@ -78,11 +78,7 @@ import Foundation
     }
 }
 
-extension Date {
-    static var yesterday: Date? {
-        Calendar.current.date(byAdding: .day, value: -1, to: Date())
-    }
-}
+
 
 //MARK: - Punch In/ Punch out -
 extension DashboardViewModel {
