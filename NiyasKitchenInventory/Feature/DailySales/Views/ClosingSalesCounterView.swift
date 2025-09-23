@@ -76,13 +76,9 @@ struct ClosingSalesCounterView: View {
                     ) {
 
                         Task {
-                            do {
-                                try await vm.submitClosing(
+                             await vm.submitClosing(
                                     userId: session.profile?.uid ?? "")
-                            } catch {
-                                print(
-                                    "Error: \(error.localizedDescription)")
-                            }
+                            
                         }
                     }.disabled(vm.total == 0 || vm.isClosingSubmitted)
                 }

@@ -66,7 +66,7 @@ import Foundation
             
             self.supplierItemsList = items.compactMap({ item in
                 var selectedItem = item
-                selectedItem.orderedQty = (item.lowStockThreshold ?? 0) * 2
+                selectedItem.orderedQty = (item.lowStockThreshold) * 2
                 
                 return selectedItem
                 

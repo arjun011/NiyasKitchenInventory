@@ -54,12 +54,10 @@ struct OpeningCashCounterView: View {
                 ) {
 
                     Task {
-                        do {
-                            try await vm.submitOpening(
+                       
+                        await vm.submitOpening(
                                 userId: session.profile?.uid ?? "")
-                        } catch {
-                            print("Error: \(error.localizedDescription)")
-                        }
+                       
                     }
                 }.disabled(vm.totalOpeningCash == 0)
 

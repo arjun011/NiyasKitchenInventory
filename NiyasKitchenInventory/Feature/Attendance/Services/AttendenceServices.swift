@@ -14,7 +14,6 @@ struct AttendenceServices: AttendenceServicesProtocol {
     }
     
     
-    
     func loadStaffList() async throws -> [UserProfile] {
         
         let snapshot = try await db.collection("users").getDocuments()
@@ -33,7 +32,7 @@ struct AttendenceServices: AttendenceServicesProtocol {
     
     func loadAttendance(startDate: Date, endDate: Date, selectedUserId: String) async throws -> [AttendanceRecord] {
         var newRecords: [AttendanceRecord] = []
-        let db = Firestore.firestore()
+        
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
