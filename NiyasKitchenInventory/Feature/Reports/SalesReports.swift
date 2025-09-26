@@ -203,7 +203,8 @@ struct SalesReportsView: View {
                     .foregroundStyle(by: .value("Category", item.category))
                     .interpolationMethod(.catmullRom)
 
-                    if item.label == vm.selectedLabel {
+                    if (vm.selectedCategory == "All" && vm.selectedLabel == item.label + item.category)
+                        || (vm.selectedCategory != "All" && vm.selectedLabel == item.label) {
                         PointMark(
                             x: .value("Date", item.label),
                             y: .value("Sales", item.value)
@@ -231,7 +232,17 @@ struct SalesReportsView: View {
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
                                     let location = value.location
-                                    if let x: String = proxy.value(atX: location.x) {
+                                    guard let x: String = proxy.value(atX: location.x) else { return }
+
+                                    let tappedPoints = vm.chartData.filter { $0.label == x }
+
+                                    // If "All" category, resolve closest line
+                                    if vm.selectedCategory == "All",
+                                       let tappedY: Double = proxy.value(atY: location.y),
+                                       let nearest = tappedPoints.min(by: { abs($0.value - tappedY) < abs($1.value - tappedY) }) {
+                                        vm.selectedLabel = nearest.label + nearest.category
+                                    } else {
+                                        // For single-category case
                                         vm.selectedLabel = x
                                     }
                                 }
