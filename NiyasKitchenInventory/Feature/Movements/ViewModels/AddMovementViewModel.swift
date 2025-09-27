@@ -47,7 +47,7 @@ import Foundation
             isLoading = false
         }
         
-        let movement = MovementModel(itemId: inventory.id.uuidString,
+        let movement = MovementModel(itemId: inventory.id ?? "",
                                      itemName: inventory.name,
                                      type: self.typesOfMovement.rawValue,
                                      quantity: Double(self.quantity) ?? 0,

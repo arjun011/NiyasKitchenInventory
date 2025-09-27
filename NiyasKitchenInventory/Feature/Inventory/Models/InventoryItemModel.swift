@@ -6,9 +6,10 @@
 //
 
 import Foundation
+@preconcurrency import FirebaseFirestore
 
-struct InventoryItemModel: Identifiable, Codable, Hashable {
-    var id = UUID()
+struct InventoryItemModel: Identifiable, Codable, Hashable, Sendable {
+    @DocumentID var id: String?
     var name: String
     var sku: String?
     var quantity: Double

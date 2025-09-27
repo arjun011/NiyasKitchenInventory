@@ -13,7 +13,7 @@ protocol AddEditInventoryServicesProtocol:Sendable {
     
     func fetchUnits() async throws -> [UnitsModel]
     
-    func saveInventory(inventory: InventoryItemModel) async throws -> InventoryItemModel
+    func saveInventory(inventory: InventoryItemModel, isEdit: Bool) async throws -> InventoryItemModel
     
     func fetchCategoryList() async throws -> [InventoryCategoryModel]
     

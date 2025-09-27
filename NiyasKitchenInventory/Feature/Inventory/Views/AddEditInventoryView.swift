@@ -10,6 +10,8 @@ import SwiftUI
 struct AddEditInventoryView: View {
 
     @State private var vm = AddEditInventoryViewModel()
+    var isEdit:Bool = false
+    var selectedItemToEdit:InventoryItemModel? = nil
 
     var body: some View {
 
@@ -155,6 +157,16 @@ struct AddEditInventoryView: View {
 
                         }
                         vm.isLoading = false
+                        if isEdit {
+                            
+                            guard let inventory = self.selectedItemToEdit else {
+                                return
+                            }
+                            
+                            vm.loadInventoryDataForUpdate(item: inventory)
+                        }
+                        
+                        
                     }
             }.disabled(vm.isLoading)
                 .blur(radius: vm.isLoading ? 1 : 0)
@@ -221,7 +233,7 @@ struct AddEditInventoryView: View {
                 }
 
             }
-        ).navigationTitle("Add Item")
+        ).navigationTitle(isEdit ? "Update Item" : "Add Item")
             .navigationBarTitleDisplayMode(.automatic)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -229,11 +241,11 @@ struct AddEditInventoryView: View {
 
                         hideKeyboard()
                         Task {
-                            await vm.saveInventory()
+                            await vm.saveInventory(inventory: selectedItemToEdit, isEdit: isEdit)
                         }
 
                     } label: {
-                        Text("Save")
+                        Text(isEdit ? "Update": "Save")
                     }.disabled(!vm.isValid)
                         .opacity(vm.isValid ? 1 : 0.5)
                         .foregroundStyle(Color.brandPrimary)

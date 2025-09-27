@@ -32,13 +32,12 @@ struct AddEditInventoryServices: AddEditInventoryServicesProtocol {
     // Generic function for SaveData on FireStore Collection
     func saveData<T:Codable>(collection: String, object : T) async throws -> T {
 
-        let uuid = UUID().uuidString
-        let docRef = db.collection(collection).document(uuid)
+        let docRef = db.collection(collection).document()
         try docRef.setData(from: object, merge: false)
         try await docRef.updateData([
             "createdAt": FieldValue.serverTimestamp(),
             "updatedAt": FieldValue.serverTimestamp(),
-            "id": uuid,
+            "id": docRef.documentID,
         ])
 
         // 4) Read back (optional) or map locally
@@ -47,18 +46,39 @@ struct AddEditInventoryServices: AddEditInventoryServicesProtocol {
         
     }
    
-    func saveInventory(inventory: InventoryItemModel) async throws -> InventoryItemModel {
+    func saveInventory(inventory: InventoryItemModel, isEdit:Bool = false) async throws -> InventoryItemModel {
 
         let snapshot = try await db.collection("Inventories").whereField(
             "lowercaseName", isEqualTo: inventory.lowercaseName ?? ""
         ).getDocuments()
 
         guard snapshot.isEmpty else { throw GeneralError.duplicateName(inventory.name) }
-
-        let newInventory:InventoryItemModel = try await self.saveData(collection:"Inventories" , object: inventory)
         
-        return newInventory
-     
+        if isEdit {
+           return try await self.updateInventory(inventory: inventory)
+            
+        }else {
+            return  try await self.saveData(collection:"Inventories" , object: inventory)
+        }
+        
+    }
+    
+    func updateInventory(inventory: InventoryItemModel) async throws -> InventoryItemModel {
+        
+        let docRef = db.collection("Inventories").document(inventory.id ?? "")
+        
+        // Convert model to [String: Any] dictionary
+        var data = try Firestore.Encoder().encode(inventory)
+        data["updatedAt"] = FieldValue.serverTimestamp()
+
+        // Update Firestore document
+        try await docRef.updateData(data)
+        
+       
+        // 4) Read back (optional) or map locally
+        let snap = try await docRef.getDocument()
+        return try snap.data(as: InventoryItemModel.self)
+        
     }
 
 }

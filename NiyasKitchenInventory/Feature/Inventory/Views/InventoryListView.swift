@@ -10,7 +10,8 @@ import SwiftUI
 struct InventoryListView: View {
 
     @State private var vm = InventoryListViewModel()
-
+    @State private var showEditView: Bool = false
+    @State var selectedInventory: InventoryItemModel? = nil
     var body: some View {
 
         ZStack {
@@ -67,24 +68,47 @@ struct InventoryListView: View {
 }
 
 extension InventoryListView {
-    func checkFilterItemsMatch() -> AnyView {
-        if vm.filteredItems.isEmpty {
-            return AnyView(
-                ContentUnavailableView {
+     func checkFilterItemsMatch() -> some View {
 
+        Group {
+            if vm.filteredItems.isEmpty {
+                ContentUnavailableView {
                     Label(
                         "No items match",
                         systemImage: "text.page.badge.magnifyingglass")
 
                 } description: {
                     Text("Try clearing filters or searching a different name.")
-                })
-        } else {
-            return AnyView(
+                }
+            } else {
+
                 List(vm.filteredItems) { item in
-                    InventoryRowView(item: item)
-                }.listStyle(.plain))
+
+                    InventoryRowView(item: item).swipeActions {
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "trash")
+                                .tint(Color.red)
+                        }
+
+                        Button {
+                            selectedInventory = item
+                            showEditView = true
+                        } label: {
+                            Image(systemName: "pencil")
+                                .tint(Color.green)
+                        }
+                    }
+
+                }.listStyle(.plain)
+            }
+        }.navigationDestination(isPresented: $showEditView) {
+            if let item = selectedInventory {
+                AddEditInventoryView(isEdit: true, selectedItemToEdit: item)
+            }
         }
+
     }
 
 }

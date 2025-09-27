@@ -18,7 +18,6 @@ import Foundation
         self.service = service
     }
     
-    
 
     var isLoading:Bool = false
     var name: String = ""
@@ -79,7 +78,7 @@ import Foundation
         self.note = ""
     }
     
-    func saveInventory() async {
+    func saveInventory(inventory:InventoryItemModel?, isEdit:Bool = false) async {
         
         guard !isLoading else { return }
         self.isLoading = true
@@ -88,7 +87,7 @@ import Foundation
             self.isLoading = false
         }
         
-        let inventory = InventoryItemModel(name: name,
+        var saveinventory = InventoryItemModel(name: name,
                                            sku: sku,
                                            quantity: quantity,
                                            unit: selectedUnit?.name ?? "",
@@ -100,15 +99,36 @@ import Foundation
                                            note: note,
                                            categoryName:selectedCategory?.name)
         
+        if isEdit {
+            saveinventory.id = inventory?.id
+        }
+        
         do {
             
-            let _ =  try await service.saveInventory(inventory: inventory)
-            self.displayErrorMessage(message: "Item added successfully")
-            self.resetValues()
+            let _ =  try await service.saveInventory(inventory: saveinventory, isEdit: isEdit)
+            self.displayErrorMessage(message: isEdit ? "Updated Item successfully" : "Item added successfully")
+            if !isEdit {
+                self.resetValues()
+            }
+            
 
         }catch {
             self.displayErrorMessage(message: error.localizedDescription)
         }
+    }
+    
+    
+    func loadInventoryDataForUpdate(item: InventoryItemModel) {
+        self.name = item.name
+        self.sku = item.sku ?? ""
+        self.quantity = item.quantity
+        self.lowStockThreshold = item.lowStockThreshold
+        self.note = item.note ?? ""
+        
+        self.selectedUnit = self.units.first{$0.name == item.unit}
+        self.selectedSupplier = self.suppliers.first{$0.name == item.supplierName}
+        self.selectedCategory = self.categories.first{$0.name == item.categoryName}
+        
     }
     
 }
