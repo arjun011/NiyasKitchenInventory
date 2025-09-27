@@ -8,58 +8,93 @@
 import SwiftUI
 
 struct SettingsView: View {
-    
     @Environment(AppSession.self) private var session
-    
+    @AppStorage("biometricLockEnabled") private var biometricLockEnabled = false
+    @State private var punchNotifications = true
+    @State private var maxWorkingHours: Double = 10
+    @State private var autoExportEnabled = false
+
+    @State private var showAccessManagement = false
+    @State private var showShiftSettings = false
+    @State private var showCategoryManager = false
+    @State private var showSupplierManager = false
+
     var body: some View {
 
         Form {
-            Section {
-
-                NavigationLink {
-                    AttendanceReportView()
-                } label: {
-                    Text("Attendance report")
-                }
-
-            } header: {
-                Text("User")
-            }
-            
-            Section {
-
-                NavigationLink {
-                    DailySalesView()
-                } label: {
-                    Text("Daily Sales")
-                }
-
-            } header: {
-                Text("Sales")
-            }
 
             Section {
-
+                Text("Name: \(session.profile?.displayName ?? "Unknown")")
+                Text("Role: \(session.profile?.role ?? "N/A")")
+                Text("Email: \(session.profile?.email ?? "N/A")")
+                Toggle(
+                    "Face ID",
+                    isOn: $biometricLockEnabled)
                 Button(role: .destructive) {
                     Task {
-
                         await session.signOut()
-
                     }
                 } label: {
-                    Text("Sign out")
+                    Text("Log Out")
                 }
 
+            } header: {
+                Text("Profile")
+            }
+
+            Section {
+                Toggle("Notifications", isOn: $punchNotifications)
+            } header: {
+                Text("Notifications")
+            }
+
+            Section {
+
+                NavigationLink {
+                    CategoryManagementView()
+                } label: {
+                    Text("Category Manager")
+                }
+
+                NavigationLink {
+                    SupplierManagementView()
+                } label: {
+                    Text("Supplier Manager")
+                }
+
+            } header: {
+                Text("Management")
+            }
+            Section("App Info & Support") {
+                Text("Version: 1.2.3")
+                Link(
+                    "Contact Developer",
+                    destination: URL(string: "https://wa.me/447442646021")!)
             }
 
         }
+        .navigationTitle("Settings")
 
+    }
+}
+
+// Dummy views for navigation (replace with actual implementations)
+
+struct CategoryManagementView: View {
+    var body: some View {
+        Text("Category Management")
+    }
+}
+
+struct SupplierManagementView: View {
+    var body: some View {
+        Text("Supplier Management")
     }
 }
 
 #Preview {
     NavigationStack {
-        SettingsView()
+        SettingsView().environment(AppSession())
     }
 
 }
