@@ -87,6 +87,9 @@ extension InventoryListView {
                     InventoryRowView(item: item).swipeActions {
                         Button {
                             
+                            Task {
+                                await vm.removedInventoryItem(at: item.id ?? "")
+                            }
                         } label: {
                             Image(systemName: "trash")
                                 .tint(Color.red)

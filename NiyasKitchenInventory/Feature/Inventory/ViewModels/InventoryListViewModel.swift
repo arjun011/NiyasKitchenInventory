@@ -92,4 +92,18 @@ import Foundation
         }
         
     }
+    
+    func removedInventoryItem(at id: String) async {
+        defer {
+            isLoading = false
+        }
+        
+        isLoading = true
+        do {
+            try await self.services.removedInventory(id: id)
+            self.inventoryItems.removeAll(where: { $0.id == id })
+        }catch {
+            print("Error =\(error)")
+        }
+    }
 }

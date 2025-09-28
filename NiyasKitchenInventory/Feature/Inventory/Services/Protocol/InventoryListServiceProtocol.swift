@@ -10,5 +10,5 @@ import Foundation
 protocol InventoryListServiceProtocol: Sendable {
     
     func fetchInventory() async throws -> [InventoryItemModel]
-    
+    func removedInventory(id: String) async throws 
 }

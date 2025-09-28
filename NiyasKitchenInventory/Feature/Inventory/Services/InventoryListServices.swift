@@ -23,5 +23,9 @@ struct InventoryListServices: InventoryListServiceProtocol {
         return inventories
         
     }
+    
+    func removedInventory(id: String) async throws {
+        try await db.collection("Inventories").document(id).delete()
+    }
 
 }
