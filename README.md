@@ -31,9 +31,11 @@
   - Xcode 16.1 (iOS 17.4 minimum deployment target)  
 
 ---
+
 ## 🧪 Testing & CI/CD  
 
-- **Unit Tests:** Planned using XCTest for services & ViewModels  
+- **Unit Tests:** ✅ Integrated using [SwiftTesting](https://github.com/apple/swift-testing)  
+  - Mock Firestore services used to avoid live read/writes 
 - **CI/CD:** GitHub Actions workflow configured  
   - Runs `xcodebuild clean build` on pull requests  
   - Detects breaking changes early  
