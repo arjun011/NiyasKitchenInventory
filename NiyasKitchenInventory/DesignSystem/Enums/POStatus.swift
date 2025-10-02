@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftUICore
+import SwiftUI    
 
 enum POStatus: String, CaseIterable, Identifiable {
     case all = "All", draft = "DRAFT", sent = "SENT", partial = "PARTIAL", received = "RECEIVED", closed = "CLOSED", canceled = "CANCELED"

@@ -27,9 +27,19 @@ struct SettingsView: View {
                 Text("Name: \(session.profile?.displayName ?? "Unknown")")
                 Text("Role: \(session.profile?.role ?? "N/A")")
                 Text("Email: \(session.profile?.email ?? "N/A")")
+                
+                NavigationLink {
+                    AttendanceReportView()
+                } label: {
+                    Text("My Attendence")
+                }
+                
                 Toggle(
                     "Face ID",
                     isOn: $biometricLockEnabled)
+                
+                
+                
                 Button(role: .destructive) {
                     Task {
                         await session.signOut()

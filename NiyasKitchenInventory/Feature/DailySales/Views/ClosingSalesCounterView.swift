@@ -20,7 +20,7 @@ struct ClosingSalesCounterView: View {
                     HStack {
                         Text(field.label)
                         Spacer()
-                        TextField("0", value: $field.count, format: .number)
+                        TextField("Qty", value: $field.count, format: .number)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
                             .frame(width: 60)
@@ -46,14 +46,30 @@ struct ClosingSalesCounterView: View {
             } header: {
                 Text("Other Collections")
             }
+            
+            Section {
+                TextField("0.0", value: $vm.cashFloat, format: .number)
+                    .keyboardType(.decimalPad)
+                    
+            } header: {
+                Text("Cash float")
+            }
 
             Section {
                 Text(vm.netCashFromCounter, format: .currency(code: "GBP"))
                     .bold()
             } header: {
-                Text("Net Cash (Closing - Opening)")
+                Text("Net Cash (Closing - (Opening + Float))")
             }
-
+           
+            
+            Section {
+                TextField("Enter note", text: $vm.note, axis: .vertical)
+                    .lineLimit(3, reservesSpace: true)
+            } header: {
+                Text("Note(Optional)")
+            }
+          
             Section {
                 HStack {
                     Text("Total")
@@ -85,7 +101,7 @@ struct ClosingSalesCounterView: View {
             }
         }.onTapGesture {
             hideKeyboard()
-        }
+        }.disabled(vm.isClosingSubmitted)
     }
     
     func salesField(title: String, value: Binding<Double>) -> some View {

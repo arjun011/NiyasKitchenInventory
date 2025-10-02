@@ -21,6 +21,10 @@ struct AttendanceReportView: View {
                         }
                     }
                     .padding(.horizontal)
+                }.sheet(isPresented: $vm.showDatePicker) {
+                    DateRangePickerView(startDate: $vm.startDate, endDate: $vm.endDate) {
+                        Task { await vm.loadAttendance() }
+                    }
                 }
             }.task {
                 guard let loginUser = session.profile else {
@@ -29,7 +33,7 @@ struct AttendanceReportView: View {
                 await vm.loadCurrentUser(currentUser: loginUser)
             }
             .navigationTitle("Attendance")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.automatic)
             .toolbar(content: {
                 ToolbarItem(placement: .topBarTrailing) {
                     if vm.currentUserRole != "Employee" {
@@ -37,11 +41,7 @@ struct AttendanceReportView: View {
                     }
                 }
             })
-            .sheet(isPresented: $vm.showDatePicker) {
-                DateRangePickerView(startDate: $vm.startDate, endDate: $vm.endDate) {
-                    Task { await vm.loadAttendance() }
-                }
-            }
+            
             
         }
     }
@@ -86,8 +86,8 @@ struct AttendanceReportView: View {
                 Image(systemName: "person.2")
             }
             .padding(8)
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(8)
+           // .background(Color(.secondarySystemBackground))
+            //.cornerRadius(8)
         }
     }
 

@@ -44,9 +44,11 @@ import Firebase
             $0 + ($1.value * Double($1.count ?? 0))
         }
     }
-
+    var cashFloat:Double = 0
+    var note:String = ""
+    var totalClosingSavedCash: Double?
     var netCashFromCounter: Double {
-        totalClosingCash - totalOpeningCash
+        totalClosingCash - ((totalClosingSavedCash ?? totalClosingCash) + cashFloat)
     }
     var total: Double {
         netCashFromCounter + deliveroo + bank + uberEats + justEat + card
@@ -60,14 +62,15 @@ import Firebase
             if let data = snapshot.data() {
                 if data["opening"] is [String: Any] {
 
-                    print("get opeing data")
-
+                    let opening = data["opening"] as! [String: Any]
+                    totalClosingSavedCash = opening["totalCash"] as? Double ?? 0
                     isOpeningSubmitted = true
                 }
                 if data["closing"] is [String: Any] {
 
                     print("get cloasinf data")
                     isClosingSubmitted = true
+                    totalClosingSavedCash = nil
                 }
             }
         } catch {
@@ -94,6 +97,7 @@ import Firebase
             
             try await services.submitOpening(userId: userId, denominations: denominations, entry: entry)
             isOpeningSubmitted = true
+            self.totalClosingSavedCash = self.totalOpeningCash
             
         }catch {
             print(error)
@@ -120,6 +124,8 @@ import Firebase
             "deliveroo": deliveroo,
             "bank": bank,
             "total": total,
+            "note":note,
+            "float":cashFloat
         ]
         
         do {
