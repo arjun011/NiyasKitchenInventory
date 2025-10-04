@@ -44,10 +44,10 @@ struct TabShellView: View {
            
             Tab("Reports", systemImage: "chart.bar.fill", value: .reports) {
                 
-                Text("Comming soon..")
-//                NavigationStack {
-//                    POView()
-//                }
+                
+                NavigationStack {
+                    SalesReportsView()
+                }
                 
                 
             }

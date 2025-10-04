@@ -101,7 +101,7 @@ struct ClosingSalesCounterView: View {
             }
         }.onTapGesture {
             hideKeyboard()
-        }.disabled(vm.isClosingSubmitted)
+        }
     }
     
     func salesField(title: String, value: Binding<Double>) -> some View {

@@ -34,21 +34,27 @@ final class SalesReportViewModel {
     var allData: [SalesDataPoint] = []
     let categories = ["Total", "Just Eat", "Uber Eat", "Cash", "Deliveroo", "All"]
 
-    init() {
-        generateMockData()
-    }
-
-    
-    func generateMockData() {
-        let calendar = Calendar(identifier: .gregorian)
-        let today = calendar.startOfDay(for: Date())
-
-        for i in 0..<5 * 365 {
-            guard let date = calendar.date(byAdding: .day, value: -i, to: today) else { continue }
-            for category in categories {
-                let value = Double.random(in: 50...300)
-                allData.append(SalesDataPoint(date: date, value: value, category: category))
+    private let services = SalesReportsServices()
+    func fetchSalesReports() async {
+        do {
+            let salesReports = try await services.fetchDailySalesReports()
+            self.allData = salesReports.flatMap { closing in
+                let date = closing.timeStamp
+                return [
+                    SalesDataPoint(date: date, value: closing.total, category: "Total"),
+                    SalesDataPoint(date: date, value: closing.justEat, category: "Just Eat"),
+                    SalesDataPoint(date: date, value: closing.uberEats, category: "Uber Eat"),
+                    SalesDataPoint(date: date, value: closing.cash, category: "Cash"),
+                    SalesDataPoint(date: date, value: closing.deliveroo, category: "Deliveroo")
+                ]
             }
+            .sorted { $0.date < $1.date }
+            
+            
+            print(self.allData)
+            
+        } catch {
+            print(error)
         }
     }
     
@@ -112,7 +118,7 @@ final class SalesReportViewModel {
                 let values = filtered.filter { range.contains($0.date) }
                 let total = values.reduce(0) { $0 + $1.value }
                 let formatter = DateFormatter()
-                formatter.dateFormat = "dd MMM"
+                formatter.dateFormat = "ddMMM"
                 let label = "\(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
                 return ChartPoint(label: label, value: total, category: selectedCategory, range: (startOfWeek, endOfWeek))
             }.sorted { $0.range.start < $1.range.start }
@@ -132,8 +138,9 @@ final class SalesReportViewModel {
                 let values = filtered.filter { interval.contains($0.date) }
                 let total = values.reduce(0) { $0 + $1.value }
                 let formatter = DateFormatter()
-                formatter.dateFormat = "MMM yyyy"
-                let label = formatter.string(from: monthStart)
+                formatter.dateFormat = "MMM"
+                let monthName = formatter.string(from: monthStart)
+                let label = String(monthName.prefix(2))
                 return ChartPoint(label: label, value: total, category: selectedCategory, range: (interval.start, interval.end))
             }.compactMap { $0 }
         }
@@ -251,7 +258,9 @@ struct SalesReportsView: View {
             }
             .frame(height: 300)
             .padding(.horizontal)
-        }
+        }.task({
+           await vm.fetchSalesReports()
+        })
         .padding()
     }
 
