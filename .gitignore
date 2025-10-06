@@ -8,6 +8,17 @@
 #           - Also handy if you have a large number of dependant pods
 #           - AS PER https://guides.cocoapods.org/using/using-cocoapods.html NEVER IGNORE THE LOCK FILE
 Pods/
+### fastlane ###
+
+# Fastlane private API key
+fastlane_keys/*.p8
+
+# Ignore fastlane build artifacts
+*.ipa
+*.dSYM.zip
+
+# Optional: ignore fastlane output folder if you're using one
+fastlane_output/
 
 ### macOS ###
 # General

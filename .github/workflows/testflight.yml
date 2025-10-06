@@ -1,0 +1,30 @@
+name: CI/CD - Build and Deploy to TestFlight
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.0'
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Run Fastlane Beta (CI + CD)
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_P8: ${{ secrets.APP_STORE_CONNECT_P8 }}
+        run: fastlane beta

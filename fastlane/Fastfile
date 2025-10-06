@@ -1,13 +1,25 @@
 lane :beta do
   increment_build_number(xcodeproj: "NiyasKitchenInventory.xcodeproj")
+
   build_app(
     scheme: "NiyasKitchenInventory",
     export_method: "app-store", # or "ad-hoc" if you're testing
     export_options: {
       provisioningProfiles: {
-        "test.NiyasKitchenInventory" => "Store2025" # 👈 Your App Store provisioning profile name
+        "test.NiyasKitchenInventory" => "Store2025"
       }
     }
   )
-  upload_to_testflight
+
+   api_key = app_store_connect_api_key(
+    key_id: "8UFKU563RP",
+    issuer_id: "1abc0cb7-edbe-4f46-a3b1-240ecccf2fba",
+    key_filepath: "fastlane_keys/AuthKey.p8",
+    duration: 1200,
+    in_house: false
+  )
+
+  upload_to_testflight(
+    api_key: api_key
+  )
 end
