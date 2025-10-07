@@ -36,6 +36,7 @@ struct NiyasKitchenInventoryApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(.light)
                 .environment(session)
                 .task {
                     session.start()
