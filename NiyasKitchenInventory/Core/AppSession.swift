@@ -71,22 +71,33 @@ struct UserProfile:Codable {
     func loadProfile(uid: String) async {
 
         do {
-            let doc = try await Firestore.firestore().collection("users")
+            let snapshot = try await Firestore.firestore().collection("users")
                 .document(uid).getDocument()
+            
+            if snapshot.exists {
+                profile = try snapshot.data(as: UserProfile.self)
 
-            let d = doc.data() ?? [:]
-
-            profile = UserProfile(
-                uid: uid,
-                role: (d["role"] as? String) ?? "viewer",
-                displayName: d["displayName"] as? String,
-                email: d["email"] as? String)
+            }else {
+               try await self.createProfile(uid: uid)
+            }
             
         } catch {
             print("Load Profile: \(error.localizedDescription)")
             // manage error
         }
 
+    }
+    
+    func createProfile(uid: String) async throws {
+
+        try await Firestore.firestore().collection("users").document(uid).setData(
+            [
+                "email": self.authUser?.email ?? "",
+                "displayName": "",
+                "role":"viewer"
+                
+            ], merge: true)
+        
     }
 
 }
