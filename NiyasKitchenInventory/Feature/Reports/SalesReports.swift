@@ -12,9 +12,10 @@ struct SalesDataPoint: Identifiable {
 @Observable
 final class SalesReportViewModel {
     enum TimeRange: String, CaseIterable, Identifiable {
-        case daily = "Daily"
-        case weekly = "Weekly"
-        case monthly = "Monthly"
+        case day = "D"
+        case week = "W"
+        case month = "M"
+        case year = "Y"
         var id: String { rawValue }
     }
 
@@ -26,7 +27,7 @@ final class SalesReportViewModel {
         let range: (start: Date, end: Date)
     }
 
-    var selectedTimeRange: TimeRange = .daily
+    var selectedTimeRange: TimeRange = .day
     var selectedPage: Int = 0
     var selectedLabel: String? = nil
     var selectedCategory: String = "Total"
@@ -71,78 +72,145 @@ final class SalesReportViewModel {
         let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
 
         switch selectedTimeRange {
-        case .daily:
-            let currentWeek = calendar.date(byAdding: .weekOfYear, value: -selectedPage, to: Date())!
-            let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: currentWeek))!
-            let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
-            let range = DateInterval(start: startOfWeek, end: endOfWeek)
-           
-            let items = selectedCategory == "All" ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
-            
+        case .day:
+            // Single day window: today by default, swipe per day
+            let targetDay = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -selectedPage, to: Date())!)
+            let endOfDay = calendar.date(byAdding: .day, value: 1, to: targetDay)!.addingTimeInterval(-1)
+            let range = DateInterval(start: targetDay, end: endOfDay)
+            let items = isAll ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
+
             if isAll {
-                
-                let grouped = Dictionary(grouping: items, by: {
-                    CategoryDateKey(category: $0.category, date: calendar.startOfDay(for: $0.date))
-                })
-                
-                
+                let grouped = Dictionary(grouping: items, by: { CategoryDateKey(category: $0.category, date: targetDay) })
                 return grouped.map { key, values in
                     let total = values.reduce(0) { $0 + $1.value }
-                    let label = key.date.formatted(date: .abbreviated, time: .omitted)
+                    let label = targetDay.formatted(date: .abbreviated, time: .omitted)
+                    return ChartPoint(label: label, value: total, category: key.category, range: (targetDay, targetDay))
+                }
+                .sorted { $0.category < $1.category }
+            } else {
+                let total = items.reduce(0) { $0 + $1.value }
+                let label = targetDay.formatted(date: .abbreviated, time: .omitted)
+                return [ChartPoint(label: label, value: total, category: selectedCategory, range: (targetDay, targetDay))]
+            }
+
+        case .week:
+            // One full week window (Mon–Sun), swipe week by week
+            let today = Date()
+            let currentWeekRef = calendar.date(byAdding: .weekOfYear, value: -selectedPage, to: today)!
+            let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: currentWeekRef))!
+            let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
+            let range = DateInterval(start: startOfWeek, end: endOfWeek)
+
+            let items = isAll ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
+
+            // Helper for month label
+            let monthLabel: (Date) -> String = { monthStart in
+                let formatter = DateFormatter()
+                formatter.dateFormat = "dd/MMM"
+                return formatter.string(from: monthStart)
+            }
+            
+            if isAll {
+                // Group by category and startOfDay
+                let grouped = Dictionary(grouping: items, by: { CategoryDateKey(category: $0.category, date: calendar.startOfDay(for: $0.date)) })
+                return grouped.map { key, values in
+                    let total = values.reduce(0) { $0 + $1.value }
+                    //let label = key.date.formatted(date: .abbreviated, time: .omitted)
+                    
+                    let label = monthLabel(key.date)
+                    
                     return ChartPoint(label: label, value: total, category: key.category, range: (key.date, key.date))
                 }
                 .sorted { $0.range.start < $1.range.start }
-                
-               } else {
-                   let grouped = Dictionary(grouping: items, by: { calendar.startOfDay(for: $0.date) })
-                   return grouped.map { date, values in
-                       let total = values.reduce(0) { $0 + $1.value }
-                       let label = date.formatted(date: .abbreviated, time: .omitted)
-                       return ChartPoint(label: label, value: total, category: selectedCategory, range: (date, date))
-                   }.sorted { $0.range.start < $1.range.start }
-               }
-            
-            
-
-        case .weekly:
-            let weeksBack = 4
-            let currentWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: Date()))!
-            let allWeeks: [Date] = (0..<weeksBack).map {
-                calendar.date(byAdding: .weekOfYear, value: -$0 - (selectedPage * weeksBack), to: currentWeek)!
+            } else {
+                let grouped = Dictionary(grouping: items, by: { calendar.startOfDay(for: $0.date) })
+                return grouped.map { date, values in
+                    let total = values.reduce(0) { $0 + $1.value }
+                   // let label = date.formatted(date: .abbreviated, time: .omitted)
+                    
+                    let label = monthLabel(date)
+                    return ChartPoint(label: label, value: total, category: selectedCategory, range: (date, date))
+                }
+                .sorted { $0.range.start < $1.range.start }
             }
 
-            return allWeeks.map { weekStart in
-                let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: weekStart))!
-                let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
-                let range = DateInterval(start: startOfWeek, end: endOfWeek)
-                let values = filtered.filter { range.contains($0.date) }
-                let total = values.reduce(0) { $0 + $1.value }
+        case .month:
+            // Full month window, swipe month by month
+            let today = Date()
+            let currentMonthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: today))!
+            let targetMonthStart = calendar.date(byAdding: .month, value: -selectedPage, to: currentMonthStart)!
+            guard let monthInterval = calendar.dateInterval(of: .month, for: targetMonthStart) else { return [] }
+
+            let items = isAll ? allData.filter { monthInterval.contains($0.date) } : filtered.filter { monthInterval.contains($0.date) }
+
+            // Helper for month label
+            let monthLabel: (Date) -> String = { monthStart in
                 let formatter = DateFormatter()
-                formatter.dateFormat = "ddMMM"
-                let label = "\(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
-                return ChartPoint(label: label, value: total, category: selectedCategory, range: (startOfWeek, endOfWeek))
-            }.sorted { $0.range.start < $1.range.start }
-
-        case .monthly:
-            let now = Date()
-            let currentMonth = calendar.component(.month, from: now)
-            let baseYear = currentMonth >= 4 ? calendar.component(.year, from: now) - selectedPage : calendar.component(.year, from: now) - selectedPage - 1
-            let months: [Date] = (0..<12).map { i in
-                let month = ((i + 3) % 12) + 1
-                let year = i < 9 ? baseYear : baseYear + 1
-                return calendar.date(from: DateComponents(year: year, month: month, day: 1))!
+                formatter.dateFormat = "d"
+                return formatter.string(from: monthStart)
+            }
+            
+            if isAll {
+                let grouped = Dictionary(grouping: items, by: { CategoryDateKey(category: $0.category, date: calendar.startOfDay(for: $0.date)) })
+                return grouped.map { key, values in
+                    let total = values.reduce(0) { $0 + $1.value }
+//                    let label = key.date.formatted(date: .abbreviated, time: .omitted)
+                    let label = monthLabel(key.date)
+                    return ChartPoint(label: label, value: total, category: key.category, range: (key.date, key.date))
+                }
+                .sorted { $0.range.start < $1.range.start }
+            } else {
+                let grouped = Dictionary(grouping: items, by: { calendar.startOfDay(for: $0.date) })
+                return grouped.map { date, values in
+                    let total = values.reduce(0) { $0 + $1.value }
+                   // let label = date.formatted(date: .abbreviated, time: .omitted)
+                    let label = monthLabel(date)
+                    
+                    return ChartPoint(label: label, value: total, category: selectedCategory, range: (date, date))
+                }
+                .sorted { $0.range.start < $1.range.start }
             }
 
-            return months.map { monthStart in
-                guard let interval = calendar.dateInterval(of: .month, for: monthStart) else { return nil }
-                let values = filtered.filter { interval.contains($0.date) }
-                let total = values.reduce(0) { $0 + $1.value }
+        case .year:
+            // One year window (Jan–Dec), swipe year by year. Ensure all 12 months appear.
+            let today = Date()
+            let currentYear = calendar.component(.year, from: today)
+            let targetYear = currentYear - selectedPage
+
+            // Build the 12 month starts for the target year
+            let monthsInYear: [Date] = (1...12).compactMap { m in
+                calendar.date(from: DateComponents(year: targetYear, month: m, day: 1))
+            }
+
+            // Helper for month label
+            let monthLabel: (Date) -> String = { monthStart in
                 let formatter = DateFormatter()
                 formatter.dateFormat = "MMM"
-                let monthName = formatter.string(from: monthStart)
-                let label = String(monthName.prefix(2))
-                return ChartPoint(label: label, value: total, category: selectedCategory, range: (interval.start, interval.end))
-            }.compactMap { $0 }
+                return formatter.string(from: monthStart)
+            }
+
+            if isAll {
+                // Produce a series per category, zero-filling months without data
+                let categoriesToShow = Set(allData.map { $0.category })
+                return monthsInYear.flatMap { monthStart -> [ChartPoint] in
+                    guard let interval = calendar.dateInterval(of: .month, for: monthStart) else { return [] }
+                    let label = monthLabel(monthStart)
+                    return categoriesToShow.map { cat in
+                        let monthValues = allData.filter { $0.category == cat && interval.contains($0.date) }
+                        let total = monthValues.reduce(0) { $0 + $1.value }
+                        return ChartPoint(label: label, value: total, category: cat, range: (interval.start, interval.end))
+                    }
+                }
+            } else {
+                // Single category: zero-fill each month
+                return monthsInYear.compactMap { monthStart in
+                    guard let interval = calendar.dateInterval(of: .month, for: monthStart) else { return nil }
+                    let values = filtered.filter { interval.contains($0.date) }
+                    let total = values.reduce(0) { $0 + $1.value }
+                    let label = monthLabel(monthStart)
+                    return ChartPoint(label: label, value: total, category: selectedCategory, range: (interval.start, interval.end))
+                }
+            }
         }
     }
 
@@ -276,3 +344,4 @@ struct SalesReportsView: View {
 #Preview {
     SalesReportsView()
 }
+
