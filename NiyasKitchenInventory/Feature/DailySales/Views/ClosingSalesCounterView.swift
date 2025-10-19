@@ -48,8 +48,8 @@ struct ClosingSalesCounterView: View {
             }
             
             Section {
-                TextField("0.0", value: $vm.cashFloat, format: .number)
-                    .keyboardType(.decimalPad)
+                TextField("0.0", text: $vm.cashFloat)
+                    .keyboardType(.numbersAndPunctuation)
                     
             } header: {
                 Text("Cash float")
@@ -104,11 +104,11 @@ struct ClosingSalesCounterView: View {
         }
     }
     
-    func salesField(title: String, value: Binding<Double>) -> some View {
+    func salesField(title: String, value: Binding<String>) -> some View {
         HStack {
             Text(title)
             Spacer()
-            TextField("0.00", value: value, format: .number)
+            TextField("0", text: value)
                 .keyboardType(.decimalPad)
                 .multilineTextAlignment(.trailing)
                 .frame(width: 100)

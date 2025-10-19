@@ -24,11 +24,11 @@ import Firebase
     var closingDenominationFields: [DenominationField] =
         DenominationField.defaultFields()
 
-    var card: Double = 0
-    var justEat: Double = 0
-    var uberEats: Double = 0
-    var bank: Double = 0
-    var deliveroo: Double = 0
+    var card: String = ""
+    var justEat: String = ""
+    var uberEats: String = ""
+    var bank: String = ""
+    var deliveroo: String = ""
 
     var isOpeningSubmitted = false
     var isClosingSubmitted = false
@@ -44,14 +44,32 @@ import Firebase
             $0 + ($1.value * Double($1.count ?? 0))
         }
     }
-    var cashFloat:Double = 0
+    var cashFloat:String = ""
     var note:String = ""
+
     var totalClosingSavedCash: Double?
-    var netCashFromCounter: Double {
-        totalClosingCash - ((totalClosingSavedCash ?? totalClosingCash) + cashFloat)
+
+    // Helper to safely parse optional String to Double
+    private func toDouble(_ string: String?) -> Double {
+        guard let s = string, !s.isEmpty else { return 0 }
+        return Double(s) ?? 0
     }
+
+    var netCashFromCounter: Double {
+        let saved = totalClosingSavedCash ?? totalClosingCash
+        let net = totalClosingCash - (saved + toDouble(cashFloat))
+        return net
+    }
+
     var total: Double {
-        netCashFromCounter + deliveroo + bank + uberEats + justEat + card
+        let net = netCashFromCounter
+        let deliverooVal = toDouble(deliveroo)
+        let bankVal = toDouble(bank)
+        let uberEatsVal = toDouble(uberEats)
+        let justEatVal = toDouble(justEat)
+        let cardVal = toDouble(card)
+        let sum = net + deliverooVal + bankVal + uberEatsVal + justEatVal + cardVal
+        return sum
     }
 
     func checkExistingSalesEntry() async {
