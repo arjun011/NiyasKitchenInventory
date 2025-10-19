@@ -68,41 +68,35 @@ final class SalesReportViewModel {
     var chartData: [ChartPoint] {
         let calendar = Calendar(identifier: .gregorian)
         
-        let isAll = selectedCategory == "All"
-        let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
-
         switch selectedTimeRange {
         case .day:
-            // Single day window: today by default, swipe per day
-            let targetDay = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -selectedPage, to: Date())!)
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: targetDay)!.addingTimeInterval(-1)
-            let range = DateInterval(start: targetDay, end: endOfDay)
-            let items = isAll ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
-
-            if isAll {
-                let grouped = Dictionary(grouping: items, by: { CategoryDateKey(category: $0.category, date: targetDay) })
-                return grouped.map { key, values in
-                    let total = values.reduce(0) { $0 + $1.value }
-                    let label = targetDay.formatted(date: .abbreviated, time: .omitted)
-                    return ChartPoint(label: label, value: total, category: key.category, range: (targetDay, targetDay))
-                }
-                .sorted { $0.category < $1.category }
-            } else {
-                let total = items.reduce(0) { $0 + $1.value }
-                let label = targetDay.formatted(date: .abbreviated, time: .omitted)
-                return [ChartPoint(label: label, value: total, category: selectedCategory, range: (targetDay, targetDay))]
-            }
-
+            return chartDataForDay(calendar: calendar)
         case .week:
             // One full week window (Mon–Sun), swipe week by week
             let today = Date()
             let currentWeekRef = calendar.date(byAdding: .weekOfYear, value: -selectedPage, to: today)!
-            let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: currentWeekRef))!
-            let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
+
+            // Compute Monday as the start of the week (00:00:00)
+            var comps = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: currentWeekRef)
+            comps.weekday = 2 // Monday
+            let monday = calendar.nextDate(after: calendar.date(from: comps) ?? currentWeekRef,
+                                           matching: DateComponents(weekday: 2),
+                                           matchingPolicy: .nextTime,
+                                           direction: .backward) ?? currentWeekRef
+            let startOfWeek = calendar.startOfDay(for: monday)
+
+            // Compute Sunday as the end of the week (23:59:59 of Sunday)
+            let sundayStart = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
+            let endOfWeek = calendar.date(byAdding: .second, value: 86399, to: sundayStart)!
+
             let range = DateInterval(start: startOfWeek, end: endOfWeek)
 
+            let isAll = selectedCategory == "All"
+            let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
             let items = isAll ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
 
+            print(items)
+            
             // Helper for month label
             let monthLabel: (Date) -> String = { monthStart in
                 let formatter = DateFormatter()
@@ -123,8 +117,11 @@ final class SalesReportViewModel {
                 }
                 .sorted { $0.range.start < $1.range.start }
             } else {
+                
+                
                 let grouped = Dictionary(grouping: items, by: { calendar.startOfDay(for: $0.date) })
-                return grouped.map { date, values in
+                print("Grouped = \(grouped)")
+                let group =  grouped.map { date, values in
                     let total = values.reduce(0) { $0 + $1.value }
                    // let label = date.formatted(date: .abbreviated, time: .omitted)
                     
@@ -132,6 +129,10 @@ final class SalesReportViewModel {
                     return ChartPoint(label: label, value: total, category: selectedCategory, range: (date, date))
                 }
                 .sorted { $0.range.start < $1.range.start }
+                
+                print("Group = \(group)")
+                
+                return group
             }
 
         case .month:
@@ -141,6 +142,8 @@ final class SalesReportViewModel {
             let targetMonthStart = calendar.date(byAdding: .month, value: -selectedPage, to: currentMonthStart)!
             guard let monthInterval = calendar.dateInterval(of: .month, for: targetMonthStart) else { return [] }
 
+            let isAll = selectedCategory == "All"
+            let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
             let items = isAll ? allData.filter { monthInterval.contains($0.date) } : filtered.filter { monthInterval.contains($0.date) }
 
             // Helper for month label
@@ -189,6 +192,9 @@ final class SalesReportViewModel {
                 return formatter.string(from: monthStart)
             }
 
+            let isAll = selectedCategory == "All"
+            let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
+
             if isAll {
                 // Produce a series per category, zero-filling months without data
                 let categoriesToShow = Set(allData.map { $0.category })
@@ -214,6 +220,31 @@ final class SalesReportViewModel {
         }
     }
 
+    private func chartDataForDay(calendar: Calendar) -> [ChartPoint] {
+        let isAll = selectedCategory == "All"
+        let filtered = isAll ? allData : allData.filter { $0.category == selectedCategory }
+
+        // Single day window: today by default, swipe per day
+        let targetDay = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -selectedPage, to: Date())!)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: targetDay)!.addingTimeInterval(-1)
+        let range = DateInterval(start: targetDay, end: endOfDay)
+        let items = isAll ? allData.filter { range.contains($0.date) } : filtered.filter { range.contains($0.date) }
+
+        if isAll {
+            let grouped = Dictionary(grouping: items, by: { CategoryDateKey(category: $0.category, date: targetDay) })
+            return grouped.map { key, values in
+                let total = values.reduce(0) { $0 + $1.value }
+                let label = targetDay.formatted(date: .abbreviated, time: .omitted)
+                return ChartPoint(label: label, value: total, category: key.category, range: (targetDay, targetDay))
+            }
+            .sorted { $0.category < $1.category }
+        } else {
+            let total = items.reduce(0) { $0 + $1.value }
+            let label = targetDay.formatted(date: .abbreviated, time: .omitted)
+            return [ChartPoint(label: label, value: total, category: selectedCategory, range: (targetDay, targetDay))]
+        }
+    }
+    
     var totalSales: Double {
         chartData.reduce(0) { $0 + $1.value }
     }
@@ -268,60 +299,146 @@ struct SalesReportsView: View {
             Text("Total: \(vm.totalSales, format: .currency(code: "GBP"))")
                 .fontWeight(.semibold)
 
-            Chart {
-                ForEach(vm.chartData) { item in
-                    LineMark(
-                        x: .value("Date", item.label),
-                        y: .value("Sales", item.value),
-                        series: .value("Category", item.category)
-                    )
-                    .foregroundStyle(by: .value("Category", item.category))
-                    .interpolationMethod(.catmullRom)
-
-                    if (vm.selectedCategory == "All" && vm.selectedLabel == item.label + item.category)
-                        || (vm.selectedCategory != "All" && vm.selectedLabel == item.label) {
-                        PointMark(
-                            x: .value("Date", item.label),
-                            y: .value("Sales", item.value)
-                        )
-                        .annotation(position: .top) {
-                            VStack(spacing: 4) {
-                                Text("\(item.category)").font(.caption2)
-                                Text(item.label).font(.caption)
-                                Text(item.value, format: .currency(code: "GBP")).bold().font(.caption2)
+            Group {
+                if vm.selectedTimeRange == .day {
+                    // Day-specific Chart (Bars) with its own overlay logic
+                    Chart {
+                        ForEach(vm.chartData) { item in
+                            if vm.selectedCategory == "All" {
+                                BarMark(
+                                    x: .value("Date", item.label),
+                                    y: .value("Sales", item.value)
+                                )
+                                .position(by: .value("Category", item.category))
+                                .foregroundStyle(by: .value("Category", item.category))
+                            } else {
+                                BarMark(
+                                    x: .value("Date", item.label),
+                                    y: .value("Sales", item.value)
+                                )
+                                .foregroundStyle(by: .value("Category", item.category))
                             }
-                            .padding(6)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .shadow(radius: 2)
-                        }
-                    }
-                }
-            }
-            .chartOverlay { proxy in
-                GeometryReader { geo in
-                    Rectangle()
-                        .fill(.clear)
-                        .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    let location = value.location
-                                    guard let x: String = proxy.value(atX: location.x) else { return }
 
-                                    let tappedPoints = vm.chartData.filter { $0.label == x }
-
-                                    // If "All" category, resolve closest line
-                                    if vm.selectedCategory == "All",
-                                       let tappedY: Double = proxy.value(atY: location.y),
-                                       let nearest = tappedPoints.min(by: { abs($0.value - tappedY) < abs($1.value - tappedY) }) {
-                                        vm.selectedLabel = nearest.label + nearest.category
-                                    } else {
-                                        // For single-category case
-                                        vm.selectedLabel = x
+                            if (vm.selectedCategory == "All" && vm.selectedLabel == item.label + item.category)
+                                || (vm.selectedCategory != "All" && vm.selectedLabel == item.label) {
+                                if vm.selectedCategory == "All" {
+                                    PointMark(
+                                        x: .value("Date", item.label),
+                                        y: .value("Sales", item.value)
+                                    )
+                                    .position(by: .value("Category", item.category))
+                                    .annotation(position: .top) {
+                                        VStack(spacing: 4) {
+                                            Text("\(item.category)").font(.caption2)
+                                            Text(item.label).font(.caption)
+                                            Text(item.value, format: .currency(code: "GBP")).bold().font(.caption2)
+                                        }
+                                        .padding(6)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .shadow(radius: 2)
+                                    }
+                                } else {
+                                    PointMark(
+                                        x: .value("Date", item.label),
+                                        y: .value("Sales", item.value)
+                                    )
+                                    .annotation(position: .top) {
+                                        VStack(spacing: 4) {
+                                            Text("\(item.category)").font(.caption2)
+                                            Text(item.label).font(.caption)
+                                            Text(item.value, format: .currency(code: "GBP")).bold().font(.caption2)
+                                        }
+                                        .padding(6)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .shadow(radius: 2)
                                     }
                                 }
-                        )
+                            }
+                        }
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { _ in
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            let location = value.location
+                                            guard let x: String = proxy.value(atX: location.x) else { return }
+
+                                            let tappedPoints = vm.chartData.filter { $0.label == x }
+
+                                            // For Day we still support both All and single category selection
+                                            if vm.selectedCategory == "All",
+                                               let tappedY: Double = proxy.value(atY: location.y),
+                                               let nearest = tappedPoints.min(by: { abs($0.value - tappedY) < abs($1.value - tappedY) }) {
+                                                vm.selectedLabel = nearest.label + nearest.category
+                                            } else {
+                                                vm.selectedLabel = x
+                                            }
+                                        }
+                                )
+                        }
+                    }
+                } else {
+                    // Existing multi-day chart (Lines) with original overlay
+                    Chart {
+                        ForEach(vm.chartData) { item in
+                            LineMark(
+                                x: .value("Date", item.label),
+                                y: .value("Sales", item.value),
+                                series: .value("Category", item.category)
+                            )
+                            .foregroundStyle(by: .value("Category", item.category))
+                            .interpolationMethod(.catmullRom)
+
+                            if (vm.selectedCategory == "All" && vm.selectedLabel == item.label + item.category)
+                                || (vm.selectedCategory != "All" && vm.selectedLabel == item.label) {
+                                PointMark(
+                                    x: .value("Date", item.label),
+                                    y: .value("Sales", item.value)
+                                )
+                                .annotation(position: .top) {
+                                    VStack(spacing: 4) {
+                                        Text("\(item.category)").font(.caption2)
+                                        Text(item.label).font(.caption)
+                                        Text(item.value, format: .currency(code: "GBP")).bold().font(.caption2)
+                                    }
+                                    .padding(6)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .shadow(radius: 2)
+                                }
+                            }
+                        }
+                    }
+                    .chartOverlay { proxy in
+                        GeometryReader { _ in
+                            Rectangle()
+                                .fill(.clear)
+                                .contentShape(Rectangle())
+                                .gesture(
+                                    DragGesture(minimumDistance: 0)
+                                        .onChanged { value in
+                                            let location = value.location
+                                            guard let x: String = proxy.value(atX: location.x) else { return }
+
+                                            let tappedPoints = vm.chartData.filter { $0.label == x }
+
+                                            if vm.selectedCategory == "All",
+                                               let tappedY: Double = proxy.value(atY: location.y),
+                                               let nearest = tappedPoints.min(by: { abs($0.value - tappedY) < abs($1.value - tappedY) }) {
+                                                vm.selectedLabel = nearest.label + nearest.category
+                                            } else {
+                                                vm.selectedLabel = x
+                                            }
+                                        }
+                                )
+                        }
+                    }
                 }
             }
             .frame(height: 300)
@@ -344,4 +461,3 @@ struct SalesReportsView: View {
 #Preview {
     SalesReportsView()
 }
-
