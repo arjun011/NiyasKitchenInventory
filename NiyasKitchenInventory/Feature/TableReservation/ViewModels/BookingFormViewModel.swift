@@ -14,7 +14,7 @@ import Foundation
 
     var name: String = ""
     var phoneNumber: String = ""
-    var numberOfGuests: Int = 2
+    var numberOfGuests = "2"
     var date: Date = Date()
     var note: String = ""
 
@@ -37,34 +37,26 @@ import Foundation
         isSubmitting = true
         submissionSuccess = false
         submissionError = nil
-
+    
         do {
-            let db = Firestore.firestore()
             let newBooking = BookingModel(
                 name: name,
                 phoneNumber: phoneNumber,
-                guests: numberOfGuests,
+                guests: Int(numberOfGuests) ?? 2,
                 dateTime: date,
                 note: note,
                 createdAt: Timestamp(date: Date()),
                 bookedBy: userId
             )
-
-            let docRef = db.collection("bookings").document()
-            try docRef.setData(from: newBooking, merge: false)
-
-            //            try await docRef.updateData([
-            //                "createdAt": FieldValue.serverTimestamp()
-            //            ])
-            //
-            //            _ = try db.collection("bookings").addDocument(from: newBooking)
+            
+            try await services.saveBooking(newBooking: newBooking)
             submissionSuccess = true
 
             // Reset form after success
 
             name = ""
             phoneNumber = ""
-            numberOfGuests = 2
+            numberOfGuests = "2"
             date = Date()
             note = ""
             print("Booking succesfull")
@@ -74,6 +66,55 @@ import Foundation
         }
 
         isSubmitting = false
+    }
+    
+    func updateBooking(by userId: String, bookigId: String?) async {
+        isSubmitting = true
+        submissionSuccess = false
+        submissionError = nil
+    
+        do {
+            var newBooking = BookingModel(
+                name: name,
+                phoneNumber: phoneNumber,
+                guests: Int(numberOfGuests) ?? 2,
+                dateTime: date,
+                note: note,
+                createdAt: Timestamp(date: Date()),
+                bookedBy: userId
+            )
+            
+            newBooking.id = bookigId ?? ""
+            
+            try await services.updateBooking(booking: newBooking)
+            submissionSuccess = true
+
+            // Reset form after success
+
+            name = ""
+            phoneNumber = ""
+            numberOfGuests = "2"
+            date = Date()
+            note = ""
+            print("Booking succesfull")
+        } catch {
+            submissionError = error.localizedDescription
+            print("Booking failed = \(error)")
+        }
+
+        isSubmitting = false
+    }
+    
+    func deleteBooking(booking: BookingModel) async {
+        do {
+            try await services.deleteBooking(booking: booking)
+            let index = self.allBookings.firstIndex(where: { $0.id == booking.id })!
+            self.allBookings.remove(at: index)
+            
+            print("Deleted booking with id: \(booking.id ?? "Error")")
+        } catch {
+            print("Failed to delete booking with id: \(booking.id ?? "Error")")
+        }
     }
 
     func loadBookings() async {
@@ -96,5 +137,13 @@ import Foundation
             print("Failed to load bookings: \(error.localizedDescription)")
         }
 
+    }
+    
+    func fillForm(for booking: BookingModel?) {
+        self.name = booking?.name ?? ""
+        self.phoneNumber = booking?.phoneNumber ?? ""
+        self.date = booking?.dateTime ?? Date()
+        self.numberOfGuests = "\(booking?.guests ?? 1)"
+        self.note = booking?.note ?? ""
     }
 }

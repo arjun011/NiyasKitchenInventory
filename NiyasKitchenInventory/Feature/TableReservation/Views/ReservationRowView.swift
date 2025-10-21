@@ -11,8 +11,6 @@ import Firebase
 struct ReservationRowView: View {
     let booking: BookingModel
 
-    
-   
     var body: some View {
         
         VStack(alignment: .leading, spacing: 4) {

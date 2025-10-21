@@ -16,7 +16,25 @@ struct ReservationView: View {
         ZStack{
             List {
                 ForEach(vm.allBookings) { booking in
-                    ReservationRowView(booking: booking)
+                    ReservationRowView(booking: booking).swipeActions {
+                        
+                        NavigationLink {
+                            BookingFormView(isEdit: true, editBooking: booking)
+                        } label: {
+                            Image(systemName: "pencil")
+                                .tint(Color.brandPrimary)
+                               
+                        }
+
+                        Button {
+                            Task {
+                               await vm.deleteBooking(booking: booking)
+                            }
+                        } label: {
+                            Image(systemName: "trash")
+                                .tint(Color.red)
+                        }
+                    }
                     
                 }
             }.blur(radius: vm.isLoading ? 1: 0)

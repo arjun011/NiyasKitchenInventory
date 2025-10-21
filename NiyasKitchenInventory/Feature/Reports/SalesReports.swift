@@ -401,7 +401,12 @@ final class SalesReportViewModel {
     }
 
     var totalSales: Double {
-        chartData.reduce(0) { $0 + $1.value }
+
+        if selectedCategory == "All" {
+           return chartData.filter { $0.category == "Total" }.reduce(0) { $0 + $1.value }
+        }
+        return chartData.reduce(0) { $0 + $1.value }
+    
     }
 
     func previousPage() { selectedPage += 1 }
@@ -423,16 +428,12 @@ struct SalesReportsView: View {
             .pickerStyle(.segmented)
             .padding(.horizontal)
 
-
             HStack {
                 Button(action: { vm.previousPage() }) {
                     Image(systemName: "chevron.left")
                 }
                 Spacer()
-                
-                
-                
-                
+
                 Text(currentRangeLabel)
                     .font(.callout)
                 Spacer()
@@ -659,9 +660,9 @@ struct SalesReportsView: View {
             }
             .frame(height: 300)
             .padding(.horizontal)
-            
+
             Spacer()
-            
+
         }.task({
             await vm.fetchSalesReports()
         }).navigationTitle("Sales Reports")
@@ -695,15 +696,15 @@ struct SalesReportsView: View {
     }
 
     private var currentRangeLabel: String {
-        
+
         guard let first = vm.chartData.first?.range.start,
             let last = vm.chartData.last?.range.end
         else { return "" }
         let formatter = DateFormatter()
         formatter.dateFormat = "dd MMM yyyy"
-       
+
         switch vm.selectedTimeRange {
-            
+
         case .day:
             return (formatter.string(from: first))
         case .week:
@@ -716,8 +717,7 @@ struct SalesReportsView: View {
             formatter.dateFormat = "yyyy"
             return (formatter.string(from: first))
         }
-        
-        
+
     }
 }
 

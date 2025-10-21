@@ -86,7 +86,6 @@ extension InventoryListView {
 
                     InventoryRowView(item: item).swipeActions {
                         Button {
-                            
                             Task {
                                 await vm.removedInventoryItem(at: item.id ?? "")
                             }

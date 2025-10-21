@@ -30,4 +30,28 @@ struct BookingServices: Sendable {
         return bookings
 
     }
+    
+    func saveBooking(newBooking:BookingModel) async throws  {
+        
+            let db = Firestore.firestore()
+            let docRef = db.collection("bookings").document()
+            try docRef.setData(from: newBooking, merge: false)
+    }
+    
+    func updateBooking(booking: BookingModel) async throws {
+        
+        let docRef = db.collection("bookings").document(booking.id ?? "")
+        
+        // Convert model to [String: Any] dictionary
+        let data = try Firestore.Encoder().encode(booking)
+        // Update Firestore document
+        try await docRef.updateData(data)
+        
+    }
+    
+    func deleteBooking(booking: BookingModel) async throws {
+        
+        let docRef = db.collection("bookings").document(booking.id ?? "")
+        try await docRef.delete()
+    }
 }
