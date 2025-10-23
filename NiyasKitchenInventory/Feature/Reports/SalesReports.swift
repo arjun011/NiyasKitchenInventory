@@ -27,7 +27,13 @@ final class SalesReportViewModel {
         let range: (start: Date, end: Date)
     }
 
-    var selectedTimeRange: TimeRange = .day
+    var selectedTimeRange: TimeRange = .day {
+        didSet {
+            // Reset pagination and selection when the range changes
+            selectedPage = 0
+            selectedLabel = nil
+        }
+    }
     var selectedPage: Int = 0
     var selectedLabel: String? = nil
     var selectedCategory: String = "Total"
@@ -94,40 +100,28 @@ final class SalesReportViewModel {
         case .week:
             // One full week window (Mon–Sun), swipe week by week
             let today = Date()
-            let currentWeekRef = calendar.date(
-                byAdding: .weekOfYear,
-                value: -selectedPage,
-                to: today
-            )!
+            // Use a calendar that starts weeks on Monday to avoid locale ambiguity
+            var cal = calendar
+            cal.firstWeekday = 2 // Monday
 
-            // Compute Monday as the start of the week (00:00:00)
-            var comps = calendar.dateComponents(
-                [.yearForWeekOfYear, .weekOfYear],
-                from: currentWeekRef
-            )
-            comps.weekday = 2  // Monday
-            let monday =
-                calendar.nextDate(
-                    after: calendar.date(from: comps) ?? currentWeekRef,
-                    matching: DateComponents(weekday: 2),
-                    matchingPolicy: .nextTime,
-                    direction: .backward
-                ) ?? currentWeekRef
-            let startOfWeek = calendar.startOfDay(for: monday)
+            // Get the week interval that contains currentWeekRef
+            let currentWeekRef = cal.date(byAdding: .weekOfYear, value: -selectedPage, to: today)!
+            
+            // Get the week interval that contains currentWeekRef
+            let weekInterval = cal.dateInterval(of: .weekOfYear, for: currentWeekRef)!
 
-            // Compute Sunday as the end of the week (23:59:59 of Sunday)
-            let sundayStart = calendar.date(
-                byAdding: .day,
-                value: 6,
-                to: startOfWeek
-            )!
-            let endOfWeek = calendar.date(
-                byAdding: .second,
-                value: 86399,
-                to: sundayStart
-            )!
+            // Use the start of the week interval directly (Calendar is set to Monday as first weekday)
+            let startOfWeek = cal.startOfDay(for: weekInterval.start)
+
+            // End of week as Sunday 23:59:59 local
+            let endOfWeek = cal.date(byAdding: .day, value: 7, to: startOfWeek)!.addingTimeInterval(-1)
 
             let range = DateInterval(start: startOfWeek, end: endOfWeek)
+            let df = DateFormatter()
+            df.timeZone = .current
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZ"
+            print("Week range: \n  start: \(df.string(from: startOfWeek))\n  end:   \(df.string(from: endOfWeek))")
+            
 
             let isAll = selectedCategory == "All"
             let filtered =
@@ -427,7 +421,7 @@ struct SalesReportsView: View {
             }
             .pickerStyle(.segmented)
             .padding(.horizontal)
-
+            
             HStack {
                 Button(action: { vm.previousPage() }) {
                     Image(systemName: "chevron.left")
@@ -728,3 +722,4 @@ struct SalesReportsView: View {
     }
 
 }
+
