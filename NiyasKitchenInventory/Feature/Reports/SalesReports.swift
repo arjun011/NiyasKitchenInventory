@@ -1,4 +1,5 @@
 import Charts
+import FirebaseCore
 import SwiftUI
 
 struct SalesDataPoint: Identifiable {
@@ -44,6 +45,10 @@ final class SalesReportViewModel {
     ]
 
     private let services = SalesReportsServices()
+    
+    
+    
+    
     func fetchSalesReports() async {
         do {
             let salesReports = try await services.fetchDailySalesReports()

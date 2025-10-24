@@ -136,14 +136,14 @@ import Firebase
             "timestamp": Timestamp(date: Date()),
             "denominations": denominations,
             "cashFromCounter": totalClosingCash,
-            "card": card,
-            "uberEats": uberEats,
-            "justEat": justEat,
-            "deliveroo": deliveroo,
-            "bank": bank,
+            "card": toDouble(card),
+            "uberEats": toDouble(uberEats),
+            "justEat": toDouble(justEat),
+            "deliveroo": toDouble(deliveroo),
+            "bank": toDouble(bank),
             "total": total,
             "note":note,
-            "float":cashFloat
+            "float":toDouble(cashFloat)
         ]
         
         do {
