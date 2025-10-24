@@ -41,12 +41,10 @@ final class SalesReportViewModel {
 
     var allData: [SalesDataPoint] = []
     let categories = [
-        "Total", "Just Eat", "Uber Eat", "Cash", "Deliveroo", "All",
+        "Total", "Just Eat","Card", "Epos", "Uber Eat", "Cash", "Deliveroo", "All",
     ]
 
     private let services = SalesReportsServices()
-    
-    
     
     
     func fetchSalesReports() async {
@@ -69,6 +67,16 @@ final class SalesReportViewModel {
                         date: date,
                         value: closing.uberEats,
                         category: "Uber Eat"
+                    ),
+                    SalesDataPoint(
+                        date: date,
+                        value: closing.epos ?? 0,
+                        category: "Epos"
+                    ),
+                    SalesDataPoint(
+                        date: date,
+                        value: closing.card,
+                        category: "Card"
                     ),
                     SalesDataPoint(
                         date: date,

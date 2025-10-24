@@ -25,6 +25,7 @@ import Firebase
         DenominationField.defaultFields()
 
     var card: String = ""
+    var epos: String = ""
     var justEat: String = ""
     var uberEats: String = ""
     var bank: String = ""
@@ -67,8 +68,9 @@ import Firebase
         let bankVal = toDouble(bank)
         let uberEatsVal = toDouble(uberEats)
         let justEatVal = toDouble(justEat)
+        let eposVal = toDouble(epos)
         let cardVal = toDouble(card)
-        let sum = net + deliverooVal + bankVal + uberEatsVal + justEatVal + cardVal
+        let sum = net + deliverooVal + bankVal + uberEatsVal + justEatVal + cardVal + eposVal
         return sum
     }
 
@@ -139,6 +141,7 @@ import Firebase
             "card": toDouble(card),
             "uberEats": toDouble(uberEats),
             "justEat": toDouble(justEat),
+            "epos": toDouble(epos),
             "deliveroo": toDouble(deliveroo),
             "bank": toDouble(bank),
             "total": total,
