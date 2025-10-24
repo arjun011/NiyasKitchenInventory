@@ -11,12 +11,55 @@ struct DashboardView: View {
 
     @Environment(AppSession.self) private var session
     @State private var vm = DashboardViewModel()
+    @State private var showPunchInPicker = false
+    @State private var showPunchOutPicker = false
+    @State private var selectedPunchInTime: Date = Date()
+    @State private var selectedPunchOutTime: Date = Date()
 
     private enum Route: Hashable {
         case reservationView
         case dailySalesReportView
     }
     @State private var navPath: [Route] = []
+
+    private func snappedToQuarterHour(_ date: Date) -> Date {
+        let calendar = Calendar.current
+        let comps = calendar.dateComponents([.hour, .minute], from: date)
+        let minute = comps.minute ?? 0
+        let snapped = (minute / 15) * 15
+        if let hour = comps.hour,
+           let adjusted = calendar.date(bySettingHour: hour, minute: snapped, second: 0, of: date) {
+            return adjusted
+        }
+        return date
+    }
+
+    private struct QuarterHourTimePicker: View {
+        let title: String
+        @Binding var date: Date
+        var onSnap: (Date) -> Date
+
+        var body: some View {
+            VStack(spacing: 16) {
+                DatePicker(
+                    title,
+                    selection: $date,
+                    displayedComponents: [.hourAndMinute]
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .onChange(of: date) { oldValue, newValue in
+                    let adjusted = onSnap(newValue)
+                    if adjusted != newValue {
+                        date = adjusted
+                    }
+                }
+
+                Spacer()
+            }
+        }
+    }
+
     var body: some View {
 
         NavigationStack(path: $navPath) {
@@ -83,17 +126,13 @@ struct DashboardView: View {
 
                             HStack(alignment: .center, spacing: 15) {
                                 PillButtonView(title: "Punch In") {
-                                    Task {
-                                        await vm.punchNow(
-                                            userId: session.profile?.uid ?? "")
-                                    }
+                                    selectedPunchInTime = Date()
+                                    showPunchInPicker = true
                                 }.disabled(!vm.isPunchInEnabled)
 
                                 PillButtonView(title: "Punch Out") {
-                                    Task {
-                                        await vm.punchNow(
-                                            userId: session.profile?.uid ?? "")
-                                    }
+                                    selectedPunchOutTime = Date()
+                                    showPunchOutPicker = true
                                 }.disabled(!vm.isPunchOutEnabled)
                             }
 
@@ -131,8 +170,58 @@ struct DashboardView: View {
 
                     }
                 }
-
-            }.task {
+            }
+            .sheet(isPresented: $showPunchInPicker) {
+                NavigationStack {
+                    QuarterHourTimePicker(title: "Select Time", date: $selectedPunchInTime, onSnap: { date in
+                        snappedToQuarterHour(date)
+                    })
+                    .padding()
+                    .navigationTitle("Punch In Time")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { showPunchInPicker = false }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Confirm") {
+                                // Call punch with selected time; if VM supports passing date, use it; otherwise call existing method
+                                Task {
+                                    await vm.punchNow(userId: session.profile?.uid ?? "")
+                                }
+                                showPunchInPicker = false
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                }
+                .presentationDetents([.height(320), .medium])
+            }
+            .sheet(isPresented: $showPunchOutPicker) {
+                NavigationStack {
+                    QuarterHourTimePicker(title: "Select Time", date: $selectedPunchOutTime, onSnap: { date in
+                        snappedToQuarterHour(date)
+                    })
+                    .padding()
+                    .navigationTitle("Punch Out Time")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { showPunchOutPicker = false }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Confirm") {
+                                // Call punch out with selected time; if VM supports passing date, use it; otherwise call existing method
+                                Task {
+                                    await vm.punchNow(userId: session.profile?.uid ?? "")
+                                }
+                                showPunchOutPicker = false
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+                }
+                .presentationDetents([.height(320), .medium])
+            }
+            .task {
                 await withTaskGroup(of: Void.self) { group in
                     group.addTask { await vm.getInventoryList() }
                     group.addTask { await vm.getWasteCount() }
@@ -145,7 +234,8 @@ struct DashboardView: View {
                             userId: userId)
                     }
                 }
-            }.navigationDestination(for: Route.self) { screenEnum in
+            }
+            .navigationDestination(for: Route.self) { screenEnum in
 
                 DashboardView.navigate(to: screenEnum)
 

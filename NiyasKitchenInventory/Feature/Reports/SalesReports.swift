@@ -41,7 +41,7 @@ final class SalesReportViewModel {
 
     var allData: [SalesDataPoint] = []
     let categories = [
-        "Total", "Just Eat","Card", "Epos", "Uber Eat", "Cash", "Deliveroo", "All",
+        "Total", "Just Eat","Clover", "Epos", "Uber Eat", "Cash", "Deliveroo", "All",
     ]
 
     private let services = SalesReportsServices()
@@ -76,7 +76,7 @@ final class SalesReportViewModel {
                     SalesDataPoint(
                         date: date,
                         value: closing.card,
-                        category: "Card"
+                        category: "Clover"
                     ),
                     SalesDataPoint(
                         date: date,
