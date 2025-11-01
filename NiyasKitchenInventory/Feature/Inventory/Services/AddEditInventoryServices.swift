@@ -52,12 +52,12 @@ struct AddEditInventoryServices: AddEditInventoryServicesProtocol {
             "lowercaseName", isEqualTo: inventory.lowercaseName ?? ""
         ).getDocuments()
 
-        guard snapshot.isEmpty else { throw GeneralError.duplicateName(inventory.name) }
         
         if isEdit {
            return try await self.updateInventory(inventory: inventory)
             
         }else {
+            guard snapshot.isEmpty else { throw GeneralError.duplicateName(inventory.name) }
             return  try await self.saveData(collection:"Inventories" , object: inventory)
         }
         

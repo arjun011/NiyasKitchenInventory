@@ -23,7 +23,7 @@ import Foundation
             email = selectedSupplier?.email ?? ""
             contact = selectedSupplier?.phone ?? ""
             supplierName = selectedSupplier?.name ?? ""
-            selectedSupplierID = selectedSupplier?.id.uuidString
+            selectedSupplierID = selectedSupplier?.id
 
             task?.cancel()
 

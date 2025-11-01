@@ -12,6 +12,14 @@ struct AddMovementView1: View {
     @Environment(\.dismiss) var dismiss
     var inventory: InventoryItemModel
     @State private var vm = AddMovementViewModel()
+    
+    private var selectedSupplierName: String {
+        if let name = vm.selectedSupplier?.name, !name.isEmpty {
+            return name
+        }
+        return "Select Supplier"
+    }
+    
     var body: some View {
 
         ZStack {
@@ -38,8 +46,7 @@ struct AddMovementView1: View {
 
                     Picker("Types", selection: $vm.typesOfMovement) {
 
-                        ForEach([MovementType.in, .out, .waste]) {
-                            type in
+                        ForEach([MovementType.in, MovementType.out, MovementType.waste]) { type in
                             Text(type.rawValue).tag(type)
                         }
 
@@ -63,16 +70,17 @@ struct AddMovementView1: View {
                     Section {
 
                         Menu {
-                            Picker("Supplier", selection: $vm.selectedSupplier)
-                            {
-                                Text("Select supplier").tag(SupplierModel?.none)
+                            
+                            Picker("Supplier", selection: $vm.selectedSupplier) {
+                                Text("Select supplier").tag(
+                                    SupplierModel?.none)
                                 ForEach(vm.suppliers) { sup in
                                     Text(sup.name).tag(Optional(sup))
                                 }
                             }
                         } label: {
                             Label(
-                                "\(vm.selectedSupplier?.name ?? "Select Supplier")",
+                                selectedSupplierName,
                                 systemImage: "person.2.fill"
                             )
                             .foregroundStyle(
@@ -85,9 +93,8 @@ struct AddMovementView1: View {
                     }.task {
                         await vm.getSupplierList()
                         vm.selectedSupplier = vm.suppliers.first {
-                            $0.id.uuidString == inventory.supplierId ?? ""
+                            $0.id == inventory.supplierId ?? ""
                         }
-
                     }
                 }
 

@@ -92,7 +92,6 @@ import Foundation
                                            quantity: quantity,
                                            unit: selectedUnit?.name ?? "",
                                            supplierName: (selectedSupplier?.name ?? ""),
-                                           supplierId: (selectedSupplier?.id.uuidString ?? UUID().uuidString),
                                            lowercaseName: name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ,
                                            lowStockThreshold: lowStockThreshold,
                                            updatedAt: Date(),
@@ -157,7 +156,7 @@ extension AddEditInventoryViewModel {
         do {
 
             let newCategory: InventoryCategoryModel =
-                try await service.saveCategory(category: category)
+            try await service.saveCategory(category: category)
             self.selectedCategory = newCategory
             self.categories.append(newCategory)
             self.categoryName = ""

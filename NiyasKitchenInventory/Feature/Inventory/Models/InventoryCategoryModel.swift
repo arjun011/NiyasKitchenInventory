@@ -9,9 +9,9 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
-struct InventoryCategoryModel:Identifiable, Hashable, Codable {
+struct InventoryCategoryModel:Identifiable, Hashable, Codable, Sendable {
     
-    var id:UUID = UUID()
+    @DocumentID var id:String?
     var name:String
     var lowercasedName:String?
     

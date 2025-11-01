@@ -7,11 +7,12 @@
 
 import Foundation
 import FirebaseCore
+@preconcurrency import FirebaseFirestore
 
 
 // MARK: - Mock Supplier model (static for now)
-struct SupplierModel: Identifiable, Hashable , Codable{
-    var id = UUID()
+struct SupplierModel: Identifiable, Hashable , Codable, Sendable{
+    @DocumentID var id:String?
     var name: String
     var lowercasedName:String?
     var phone: String?

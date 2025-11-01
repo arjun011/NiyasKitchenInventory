@@ -12,6 +12,8 @@ struct InventoryListView: View {
     @State private var vm = InventoryListViewModel()
     @State private var showEditView: Bool = false
     @State var selectedInventory: InventoryItemModel? = nil
+    @State private var showDeleteAlert: Bool = false
+    @State private var pendingDeleteItem: InventoryItemModel? = nil
     var body: some View {
 
         ZStack {
@@ -85,15 +87,7 @@ extension InventoryListView {
                 List(vm.filteredItems) { item in
 
                     InventoryRowView(item: item).swipeActions {
-                        Button {
-                            Task {
-                                await vm.removedInventoryItem(at: item.id ?? "")
-                            }
-                        } label: {
-                            Image(systemName: "trash")
-                                .tint(Color.red)
-                        }
-
+                        
                         Button {
                             selectedInventory = item
                             showEditView = true
@@ -101,11 +95,32 @@ extension InventoryListView {
                             Image(systemName: "pencil")
                                 .tint(Color.green)
                         }
+                        
+                        Button {
+                            pendingDeleteItem = item
+                            showDeleteAlert = true
+                        } label: {
+                            Image(systemName: "trash")
+                                .tint(Color.red)
+                        }
+
+                      
                     }
 
                 }.listStyle(.plain)
             }
-        }.navigationDestination(isPresented: $showEditView) {
+        }
+        .alert("Delete Item?", isPresented: $showDeleteAlert, presenting: pendingDeleteItem) { item in
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                Task {
+                    await vm.removedInventoryItem(at: item.id ?? "")
+                }
+            }
+        } message: { item in
+            Text("Are you sure you want to delete \(item.name)?")
+        }
+        .navigationDestination(isPresented: $showEditView) {
             if let item = selectedInventory {
                 AddEditInventoryView(isEdit: true, selectedItemToEdit: item)
             }
@@ -122,3 +137,4 @@ extension InventoryListView {
     }
 
 }
+
