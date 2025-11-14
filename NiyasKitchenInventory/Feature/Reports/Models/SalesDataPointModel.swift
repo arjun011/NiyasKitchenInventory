@@ -10,15 +10,7 @@ import Foundation
 struct DailySalesClosingPoint:Codable, Identifiable, Sendable {
     
     @DocumentID var id: String?
-   // let date: Date
-//    let category: String // Add category field
-//    enum categoeryEnum:String {
-//        case Total, JustEat, UberEat, Cash, Deliveroo
-//    }
-//    var salesCategory: categoeryEnum {
-//        categoeryEnum(rawValue: category) ?? .Total
-//    }
-    
+   
     let timeStamp:Date
     let userID:String
     let bank:Double
