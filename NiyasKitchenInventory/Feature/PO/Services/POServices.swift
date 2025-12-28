@@ -22,22 +22,34 @@ struct POServices: Sendable {
 
     private var db:Firestore { Firestore.firestore() }
 
-    func getInventoriesBy(supplierID: String) async throws -> [POLineModel] {
+    func getInventoriesBy(supplier: SupplierModel) async throws -> [POLineModel] {
 
-        let snapshot = try await db.collection("Inventories").whereField(
-            "supplierId", isEqualTo: supplierID
-        ).getDocuments()
+        // 1) Try supplierId first
+        let idSnapshot = try await db.collection("Inventories")
+            .whereField("supplierId", isEqualTo: (supplier.id ?? ""))
+            .getDocuments()
 
-        guard !snapshot.isEmpty else {
-            throw POServicesError.itemsNotFound
+        if !idSnapshot.isEmpty {
+            let inventoryList = try idSnapshot.documents.compactMap { doc in
+                try doc.data(as: POLineModel.self)
+            }
+            return inventoryList
         }
 
-        let inventoryList = try snapshot.documents.compactMap { doc in
-            return try doc.data(as: POLineModel.self)
+        // 2) Fallback to supplierName if no id matches
+        let nameSnapshot = try await db.collection("Inventories")
+            .whereField("supplierName", isEqualTo: (supplier.name ?? ""))
+            .getDocuments()
+
+        if !nameSnapshot.isEmpty {
+            let inventoryList = try nameSnapshot.documents.compactMap { doc in
+                try doc.data(as: POLineModel.self)
+            }
+            return inventoryList
         }
 
-        return inventoryList
-
+        // 3) Nothing found
+        throw POServicesError.itemsNotFound
     }
 
     func saveDraft(orderDraft: POModel, lines: [POLineModel]) async throws {

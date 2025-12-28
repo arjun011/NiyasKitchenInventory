@@ -28,8 +28,13 @@ import Foundation
             task?.cancel()
 
             task = Task {
+                
+                guard let supplier = selectedSupplier else {
+                    return
+                }
+                
                 await self.getInventoryItemsBy(
-                    suuplierId: selectedSupplierID ?? "")
+                    suuplier: supplier)
             }
 
         }
@@ -58,11 +63,11 @@ import Foundation
 
     }
 
-    func getInventoryItemsBy(suuplierId: String) async {
+    func getInventoryItemsBy(suuplier: SupplierModel) async {
 
         do {
             let items = try await service.getInventoriesBy(
-                supplierID: suuplierId)
+                supplier: suuplier)
             
             self.supplierItemsList = items.compactMap({ item in
                 var selectedItem = item

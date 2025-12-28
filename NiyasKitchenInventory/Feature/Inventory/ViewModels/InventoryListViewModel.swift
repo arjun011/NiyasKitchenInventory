@@ -106,4 +106,8 @@ import Foundation
             print("Error =\(error)")
         }
     }
+    
+    deinit {
+        print("Deinit Inventory List")
+    }
 }

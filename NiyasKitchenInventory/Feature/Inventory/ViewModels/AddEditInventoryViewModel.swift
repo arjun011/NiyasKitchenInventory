@@ -92,6 +92,7 @@ import Foundation
                                            quantity: quantity,
                                            unit: selectedUnit?.name ?? "",
                                            supplierName: (selectedSupplier?.name ?? ""),
+                                            supplierId: (selectedSupplier?.id ?? ""),
                                            lowercaseName: name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ,
                                            lowStockThreshold: lowStockThreshold,
                                            updatedAt: Date(),
@@ -130,6 +131,9 @@ import Foundation
         
     }
     
+    deinit {
+        print("Deinit AddEditInventoryViewModel")
+    }
 }
 
 //MARK: - Category -
