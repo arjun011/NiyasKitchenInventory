@@ -55,6 +55,13 @@
 			);
 			target = DCC1C3C32E44D98C00D6E1A9 /* NiyasKitchenInventory */;
 		};
+		DCCFCE562F017CE700888740 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Feature/CashFlow/Views/CashFlowView.swift,
+			);
+			target = DC074AFB2E7ACA8800398A55 /* NiyasKitchenInventoryTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,6 +74,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DCC1C4022E4773BB00D6E1A9 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventory" target */,
+				DCCFCE562F017CE700888740 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */,
 			);
 			path = NiyasKitchenInventory;
 			sourceTree = "<group>";

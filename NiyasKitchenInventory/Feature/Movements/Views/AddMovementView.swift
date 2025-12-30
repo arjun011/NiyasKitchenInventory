@@ -62,7 +62,7 @@ struct AddMovementView1: View {
                         .keyboardType(.decimalPad)
                     
                 } header: {
-                    Text("QUANTITY")
+                    Text("Quantity")
                 }
 
                 if vm.typesOfMovement == .in {
