@@ -145,7 +145,6 @@ final class SalesReportViewModel {
                 ? allData.filter { range.contains($0.date) }
                 : filtered.filter { range.contains($0.date) }
 
-            print(items)
 
             // Helper for month label
             let monthLabel: (Date) -> String = { monthStart in

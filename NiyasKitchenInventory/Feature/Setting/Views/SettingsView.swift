@@ -71,6 +71,12 @@ struct SettingsView: View {
                 } label: {
                     Text("Supplier Manager")
                 }
+                
+                NavigationLink {
+                    CashFlowReportView()
+                } label: {
+                    Text("CashFlow")
+                }
 
             } header: {
                 Text("Management")

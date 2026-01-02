@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum MovementType: String, CaseIterable, Identifiable {
+enum MovementType: String, CaseIterable, Identifiable, Decodable {
     var id: String {
         rawValue
     }

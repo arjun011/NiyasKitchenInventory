@@ -58,7 +58,15 @@
 		DCCFCE562F017CE700888740 /* Exceptions for "NiyasKitchenInventory" folder in "NiyasKitchenInventoryTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				DesignSystem/Components/DateRangePickerView.swift,
+				Feature/CashFlow/Model/CashFlowModel.swift,
+				Feature/CashFlow/Services/CashFlowServices.swift,
+				Feature/CashFlow/Services/Protocols/CashServicesProtocol.swift,
+				Feature/CashFlow/ViewModel/CashFlowReportViewModel.swift,
+				Feature/CashFlow/ViewModel/CashFlowViewModel.swift,
+				Feature/CashFlow/Views/CashFlowReportView.swift,
 				Feature/CashFlow/Views/CashFlowView.swift,
+				Feature/CashFlow/Views/CashReportCellView.swift,
 			);
 			target = DC074AFB2E7ACA8800398A55 /* NiyasKitchenInventoryTests */;
 		};

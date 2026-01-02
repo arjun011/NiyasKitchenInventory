@@ -8,62 +8,65 @@
 import SwiftUI
 
 struct CashFlowView: View {
-    
-    @State var cash:String = ""
-    @State var description:String = ""
-    @State var flowtype:MovementType = .out
-    
+    @Environment(AppSession.self) private var session
+    @State private var vm = CashFlowViewModel()
     var body: some View {
-        
+
         ZStack {
-            
+
             Form {
-                
                 Section("Date") {
-                    Text("\(Date().formatted(date: .abbreviated, time: .omitted))")
+                    Text(
+                        "\(Date().formatted(date: .abbreviated, time: .omitted))"
+                    )
                 }
 
                 Section("Flow") {
-                    
-                    Picker("", selection: $flowtype) {
+
+                    Picker("", selection: $vm.flowType) {
                         ForEach([MovementType.in, .out]) { type in
                             Text(type.rawValue).tag(type)
                         }
                     }.pickerStyle(.segmented)
                 }
-                
+
                 Section("Cash") {
-                    TextField("0", text: $cash)
-                        .keyboardType(.numberPad)
+                    TextField("0", text: $vm.ammount)
+                        .keyboardType(.decimalPad)
                 }
-                
+
                 Section("Description") {
-                    TextField("", text: $description, axis: .vertical)
+                    TextField("", text: $vm.description, axis: .vertical)
                         .lineLimit(3, reservesSpace: true)
                 }
-                
-                
-            }.navigationTitle("Cash Flow")
-                .navigationBarTitleDisplayMode(.automatic)
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Save") {
-                            
-                        }.fontWeight(.semibold)
-                        .foregroundStyle(Color.textPrimary)
-                    }
+
+            }.onTapGesture {
+                hideKeyboard()
+            }
+            .navigationTitle("Cash Flow")
+            .navigationBarTitleDisplayMode(.automatic)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Save") {
+                        Task {
+                            await self.vm.saveCashFlow(by: session.profile?.uid ?? "")
+                        }
+                    }.fontWeight(.semibold)
+                        .disabled(!vm.isValidate)
+
                 }
-            
+            }
+
         }
-        
+
     }
 }
 
 #Preview {
-    
+
     NavigationStack {
         CashFlowView()
+            .environment(AppSession())
     }
-    
-    
+
 }
