@@ -16,12 +16,15 @@ struct CashFlowServices: CashServicesProtocol {
         }
     }
     
+    private enum CashFlowError: Error {
+        case manualTest
+    }
+    
     func saveCashFlow(flow: CashFlowModel) async throws {
        
         let doc = db.collection("cashFlow").document()
         var draft = flow
         draft.id = doc.documentID
-
         try doc.setData(from: draft, merge: false)
     }
     

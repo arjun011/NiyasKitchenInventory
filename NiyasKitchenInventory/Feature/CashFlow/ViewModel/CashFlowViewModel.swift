@@ -30,7 +30,6 @@ import Foundation
         
         do {
             try await self.services.saveCashFlow(flow: cashFlow)
-            print("Saved succefully")
         } catch {
             self.errorMessage = error.localizedDescription
         }

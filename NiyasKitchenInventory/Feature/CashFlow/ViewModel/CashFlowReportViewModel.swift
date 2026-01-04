@@ -10,8 +10,7 @@ import Foundation
 @MainActor
 @Observable final class CashFlowReportViewModel {
 
-    var startDate =
-        Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+    var startDate = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
     var endDate = Date()
     var showDatePicker: Bool = false
     var cashFlowReport = [CashFlowModel]()
@@ -44,9 +43,7 @@ import Foundation
             
             self.cashFlowReport = flowReport
             self.dailySalesClosings = dailySales
-            print(cashFlowReport.count)
-            print(dailySalesClosings.count)
-
+            
         } catch {
             print(error.localizedDescription)
         }

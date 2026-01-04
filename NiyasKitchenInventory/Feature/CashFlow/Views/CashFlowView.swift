@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CashFlowView: View {
     @Environment(AppSession.self) private var session
+    @Environment(\.dismiss) private var dismiss
     @State private var vm = CashFlowViewModel()
     var body: some View {
 
@@ -39,6 +40,14 @@ struct CashFlowView: View {
                     TextField("", text: $vm.description, axis: .vertical)
                         .lineLimit(3, reservesSpace: true)
                 }
+                
+                Section {
+                    if !vm.errorMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text(vm.errorMessage)
+                            .foregroundStyle(Color.red)
+                            .font(.headline)
+                    }
+                }
 
             }.onTapGesture {
                 hideKeyboard()
@@ -49,7 +58,14 @@ struct CashFlowView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                            await self.vm.saveCashFlow(by: session.profile?.uid ?? "")
+                             await self.vm.saveCashFlow(by: session.profile?.uid ?? "")
+                            
+                            if vm.errorMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                await MainActor.run {
+                                    dismiss()
+                                }
+                            }
+                            
                         }
                     }.fontWeight(.semibold)
                         .disabled(!vm.isValidate)

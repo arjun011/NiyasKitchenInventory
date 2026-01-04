@@ -19,6 +19,7 @@ struct DashboardView: View {
     private enum Route: Hashable {
         case reservationView
         case dailySalesReportView
+        case cashFlow
     }
     @State private var navPath: [Route] = []
 
@@ -113,6 +114,16 @@ struct DashboardView: View {
                         bgColor: Color.brandPrimary
                     ) {
                         navPath.append(.dailySalesReportView)
+
+                    }
+                    
+                    KIPStatCardView(
+                        title: "Cash Flow",
+                        value: 0,  // Optional: Could use today's total sales if available
+                        icon: "building.columns",
+                        bgColor: Color.brandPrimary
+                    ) {
+                        navPath.append(.cashFlow)
 
                     }
 
@@ -256,6 +267,8 @@ extension DashboardView {
             return AnyView(ReservationView())
         case .dailySalesReportView:
             return AnyView(DailySalesView())
+        case .cashFlow:
+            return AnyView(CashFlowReportView())
         }
     }
 }
