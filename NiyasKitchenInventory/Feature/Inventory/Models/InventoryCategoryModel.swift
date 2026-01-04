@@ -7,7 +7,7 @@
 
 import Foundation
 import FirebaseAuth
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 
 struct InventoryCategoryModel:Identifiable, Hashable, Codable, Sendable {
     

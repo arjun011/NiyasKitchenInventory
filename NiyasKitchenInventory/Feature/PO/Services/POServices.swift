@@ -38,7 +38,7 @@ struct POServices: Sendable {
 
         // 2) Fallback to supplierName if no id matches
         let nameSnapshot = try await db.collection("Inventories")
-            .whereField("supplierName", isEqualTo: (supplier.name ?? ""))
+            .whereField("supplierName", isEqualTo: (supplier.name))
             .getDocuments()
 
         if !nameSnapshot.isEmpty {

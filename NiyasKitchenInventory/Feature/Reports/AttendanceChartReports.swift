@@ -67,7 +67,7 @@ struct OverallAttendanceView: View {
         }
     }
 }
-
+@MainActor
 final class OverallAttendanceViewModel: ObservableObject {
     enum TimeRange: String, CaseIterable, Identifiable {
         case daily = "Daily"
