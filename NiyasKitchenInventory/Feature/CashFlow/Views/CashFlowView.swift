@@ -11,12 +11,17 @@ struct CashFlowView: View {
     @Environment(AppSession.self) private var session
     @Environment(\.dismiss) private var dismiss
     @State private var vm = CashFlowViewModel()
+    @State private var selectedDate:Date = Date()
+    
     var body: some View {
 
         ZStack {
 
             Form {
-                Section("Date") {
+                Section {
+                    
+                    DatePicker("Date", selection: $selectedDate, in: ...Date(), displayedComponents: [.date])
+                    
                     Text(
                         "\(Date().formatted(date: .abbreviated, time: .omitted))"
                     )
@@ -58,7 +63,7 @@ struct CashFlowView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
                         Task {
-                             await self.vm.saveCashFlow(by: session.profile?.uid ?? "")
+                             await self.vm.saveCashFlow(by: session.profile?.uid ?? "", dateSubmitted: selectedDate)
                             
                             if vm.errorMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                 await MainActor.run {
@@ -86,3 +91,4 @@ struct CashFlowView: View {
     }
 
 }
+

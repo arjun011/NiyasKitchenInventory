@@ -56,10 +56,10 @@ struct OverallAttendanceView: View {
             Spacer()
         }
         .padding()
-        .onChange(of: vm.selectedTimeRange) { _ in
+        .onChange(of: vm.selectedTimeRange) {
             vm.updateChartData()
         }
-        .onChange(of: vm.selectedPage) { _ in
+        .onChange(of: vm.selectedPage) {
             vm.updateChartData()
         }
         .task {
@@ -192,4 +192,3 @@ struct AttendanceRecord1 {
 #Preview {
     OverallAttendanceView()
 }
-

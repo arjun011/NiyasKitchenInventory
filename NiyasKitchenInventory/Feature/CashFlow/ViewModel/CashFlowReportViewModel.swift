@@ -27,7 +27,7 @@ import Foundation
             
             let outTotal: Double = cashFlowReport.filter{$0.flowType == MovementType.out.rawValue}.map{Double($0.ammount)}.reduce(0.0, +)
             
-            return ((inTotal + dailySalesCash) - outTotal)
+            return (inTotal - outTotal)
         }
     }
 

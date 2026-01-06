@@ -24,9 +24,9 @@ import Foundation
         self.services = services
     }
     
-    func saveCashFlow(by userName: String) async {
+    func saveCashFlow(by userName: String, dateSubmitted: Date) async {
         
-        let cashFlow = CashFlowModel(ammount: Float(ammount) ?? 0, description: self.description, created: Date(), createdBy: userName, flowType: self.flowType.rawValue)
+        let cashFlow = CashFlowModel(ammount: Float(ammount) ?? 0, description: self.description, created: dateSubmitted, createdBy: userName, flowType: self.flowType.rawValue)
         
         do {
             try await self.services.saveCashFlow(flow: cashFlow)
