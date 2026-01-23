@@ -8,16 +8,19 @@
 import SwiftUI
 import MessageUI
 
+
 struct MailComposerView: UIViewControllerRepresentable {
     let to: String
     let subject: String
     let body: String
     var onResult: (Result<Void, Error>) -> Void
 
-    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+    @MainActor
+    final class Coordinator: NSObject, @preconcurrency MFMailComposeViewControllerDelegate {
         let parent: MailComposerView
         init(_ parent: MailComposerView) { self.parent = parent }
-
+       
+        @MainActor
         func mailComposeController(_ controller: MFMailComposeViewController,
                                    didFinishWith result: MFMailComposeResult,
                                    error: Error?) {

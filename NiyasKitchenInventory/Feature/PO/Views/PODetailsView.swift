@@ -11,7 +11,6 @@ import MessageUI
 struct PODetailsView: View {
     @State private var vm = PODetailsViewModel()
     var orderDetail: POModel
-    @State private var showComposer = false
     @State private var composerPayload: (to: String, subject: String, body: String)?
 
     var body: some View {
@@ -96,9 +95,10 @@ struct PODetailsView: View {
                             fill: .brandPrimary, textColor: .white, text: "Send to Supplier"
                         ) {
 
-                            presentComposer(for: orderDetail , lines: vm.lines)
-                            
-                            print("Send action")
+                            Task {
+                                await presentComposer(for: orderDetail , lines: vm.lines)
+                                print("Send action")
+                            }
 
                         }.buttonStyle(.plain)
 
@@ -117,18 +117,18 @@ struct PODetailsView: View {
 
                 } header: {
                     Text("Actions")
-                }.sheet(isPresented: $showComposer) {
-                    if let payload = composerPayload {
-                        MailComposerView(to: payload.to, subject: payload.subject, body: payload.body) { result in
-                            switch result {
-                            case .success:
-                                
-                                print("mail send successfully")
-                                
-                               // Task { await vm.didSendEmailSuccessfully() }
-                            case .failure:
-                                break // user cancelled or error; do nothing
-                            }
+                }.sheet(isPresented: Binding(
+                    get: { composerPayload != nil },
+                    set: { if !$0 { composerPayload = nil } }
+                )) {
+                    let payload = composerPayload!
+                    MailComposerView(to: payload.to, subject: payload.subject, body: payload.body) { result in
+                        switch result {
+                        case .success:
+                            print("mail send successfully")
+                            // Task { await vm.didSendEmailSuccessfully() }
+                        case .failure:
+                            break // user cancelled or error; do nothing
                         }
                     }
                 }
@@ -141,7 +141,7 @@ struct PODetailsView: View {
         }
     }
     
-    private func presentComposer(for po: POModel, lines: [POLineModel]) {
+    private func presentComposer(for po: POModel, lines: [POLineModel]) async {
             guard MFMailComposeViewController.canSendMail() else {
                 // Fallback: open Mail app
                 let subject = "PO \(po.id ?? "") – \(po.supplierName)"
@@ -150,17 +150,23 @@ struct PODetailsView: View {
                 let sub = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                 let bod = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                 if let url = URL(string: "mailto:\(to)?subject=\(sub)&body=\(bod)") {
-                    UIApplication.shared.open(url)
+                    await UIApplication.shared.open(url)
                 }
                 return
             }
+        
+        
+        await MainActor.run {
             composerPayload = (po.supplierEmail, "PO \(po.id ?? "") – \(po.supplierName)", makeEmailBody(po: po, lines: lines))
-            showComposer = true
+        }
+        
+            
         }
 
         private func makeEmailBody(po: POModel, lines: [POLineModel]) -> String {
             let date = DateFormatter.localizedString(from: po.expectedDate ?? Date(), dateStyle: .medium, timeStyle: .none)
-            let items = lines.map { "• \($0.itemName): \(Double($0.orderedQty ?? 0)) \($0.unitName)" }.joined(separator: "\n")
+            
+            let items = lines.map { "• \($0.sku ?? ""):  \($0.itemName):  \(Double($0.orderedQty ?? 0)) \($0.unitName)" }.joined(separator: "\n")
             let body = """
             Hello \(po.supplierName),
 
