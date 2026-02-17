@@ -20,6 +20,7 @@ struct DashboardView: View {
         case reservationView
         case dailySalesReportView
         case cashFlow
+        case allergenseView
     }
     @State private var navPath: [Route] = []
 
@@ -125,6 +126,13 @@ struct DashboardView: View {
                     ) {
                         navPath.append(.cashFlow)
 
+                    }
+                    
+                    KIPStatCardView(
+                        title: "Allergens", value: 0,
+                        icon: "allergens.fill", bgColor: Color.red
+                    ) {
+                        navPath.append(.allergenseView)
                     }
 
                     VStack(
@@ -269,6 +277,8 @@ extension DashboardView {
             return AnyView(DailySalesView())
         case .cashFlow:
             return AnyView(CashFlowReportView())
+        case .allergenseView:
+            return AnyView(DishListView())
         }
     }
 }
