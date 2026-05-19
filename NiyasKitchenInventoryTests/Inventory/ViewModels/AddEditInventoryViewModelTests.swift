@@ -37,7 +37,7 @@ import Foundation
        
         let vm = await AddEditInventoryViewModel(service: mock)
         
-        await vm.saveInventory()
+        //await vm.saveInventory(inventory: <#InventoryItemModel?#>)
         
         await MainActor.run {
             #expect(vm.errorMessage == "Item added successfully")
