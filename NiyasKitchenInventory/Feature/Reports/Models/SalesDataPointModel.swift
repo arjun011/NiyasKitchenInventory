@@ -17,6 +17,7 @@ struct DailySalesClosingPoint:Codable, Identifiable, Sendable {
     let card:Double
     let cash:Double
     let deliveroo:Double
+    let JHD:Double?
     let justEat:Double
     let epos:Double?
     let total:Double
@@ -24,7 +25,7 @@ struct DailySalesClosingPoint:Codable, Identifiable, Sendable {
     
     enum CodingKeys: String, CodingKey{
         case bank, card, deliveroo, justEat, epos
-        case total, uberEats
+        case total, uberEats, JHD
         case cash = "cashFromCounter"
         case timeStamp = "timestamp"
         case userID = "userId"

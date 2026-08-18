@@ -27,6 +27,7 @@ import Firebase
     var card: String = ""
     var epos: String = ""
     var justEat: String = ""
+    var JHD: String = ""
     var uberEats: String = ""
     var bank: String = ""
     var deliveroo: String = ""
@@ -68,9 +69,10 @@ import Firebase
         let bankVal = toDouble(bank)
         let uberEatsVal = toDouble(uberEats)
         let justEatVal = toDouble(justEat)
+        let JHDVal = toDouble(JHD)
         let eposVal = toDouble(epos)
         let cardVal = toDouble(card)
-        let sum = net + deliverooVal + bankVal + uberEatsVal + justEatVal + cardVal + eposVal
+        let sum = net + deliverooVal + bankVal + uberEatsVal + justEatVal + cardVal + eposVal + JHDVal
         return sum
     }
 
@@ -142,6 +144,7 @@ import Firebase
             "card": toDouble(card),
             "uberEats": toDouble(uberEats),
             "justEat": toDouble(justEat),
+            "JHD": toDouble(JHD),
             "epos": toDouble(epos),
             "deliveroo": toDouble(deliveroo),
             "bank": toDouble(bank),

@@ -39,7 +39,8 @@ struct ClosingSalesCounterView: View {
 
             Section {
                 salesField(title: "Clover", value: $vm.card)
-                salesField(title: "Epos Card", value: $vm.epos)
+                salesField(title: "SumUp", value: $vm.epos)
+                salesField(title: "JHD", value: $vm.JHD)
                 salesField(title: "Just Eat", value: $vm.justEat)
                 salesField(title: "Uber Eats", value: $vm.uberEats)
                 salesField(title: "Deliveroo", value: $vm.deliveroo)
