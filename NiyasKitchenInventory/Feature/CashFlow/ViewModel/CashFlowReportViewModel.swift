@@ -23,7 +23,7 @@ import Foundation
         get {
             let inTotal:Double = cashFlowReport.filter{$0.flowType == MovementType.in.rawValue}.map{Double($0.ammount)}.reduce(0.0, +)
 
-            let dailySalesCash:Double = dailySalesClosings.map{$0.cash}.reduce(0.0, +)
+          //  let _:Double = dailySalesClosings.map{$0.cash}.reduce(0.0, +)
             
             let outTotal: Double = cashFlowReport.filter{$0.flowType == MovementType.out.rawValue}.map{Double($0.ammount)}.reduce(0.0, +)
             
